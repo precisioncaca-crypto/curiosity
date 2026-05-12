@@ -1,0 +1,99 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard — Admin ParkSide{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div class="flex justify-between items-center">
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Utilizatori</p>
+                <p class="text-3xl font-extrabold text-gray-800 mt-1">{{ total_users }}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-users text-blue-600 text-lg"></i>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div class="flex justify-between items-center">
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Rezervări Active</p>
+                <p class="text-3xl font-extrabold text-gray-800 mt-1">{{ active_reservations }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">din {{ total_reservations }} total</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-calendar-check text-green-600 text-lg"></i>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div class="flex justify-between items-center">
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Venit Total</p>
+                <p class="text-3xl font-extrabold text-gray-800 mt-1">{{ total_revenue }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">RON confirmat</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-coins text-yellow-600 text-lg"></i>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div class="flex justify-between items-center">
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wide">Parcări</p>
+                <p class="text-3xl font-extrabold text-gray-800 mt-1">{{ total_parkings }}</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-parking text-purple-600 text-lg"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div class="flex justify-between items-center mb-5">
+        <h2 class="font-bold text-gray-800 text-base">Rezervări Recente</h2>
+        <a href="/admin/reservations" class="text-blue-600 text-sm hover:underline font-medium">Vezi toate →</a>
+    </div>
+    {% if recent %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-gray-100">
+                    <th class="text-left pb-3 text-gray-400 font-semibold text-xs uppercase tracking-wide">#</th>
+                    <th class="text-left pb-3 text-gray-400 font-semibold text-xs uppercase tracking-wide">Utilizator</th>
+                    <th class="text-left pb-3 text-gray-400 font-semibold text-xs uppercase tracking-wide">Parcare</th>
+                    <th class="text-left pb-3 text-gray-400 font-semibold text-xs uppercase tracking-wide">Perioadă</th>
+                    <th class="text-left pb-3 text-gray-400 font-semibold text-xs uppercase tracking-wide">Preț</th>
+                    <th class="text-left pb-3 text-gray-400 font-semibold text-xs uppercase tracking-wide">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for res in recent %}
+                <tr class="hover:bg-gray-50/50">
+                    <td class="py-3 text-gray-400 font-medium">#{{ res.id }}</td>
+                    <td class="py-3 font-semibold text-gray-700">{{ res.user.name }}</td>
+                    <td class="py-3 text-gray-600">{{ res.parking_lot.name }}</td>
+                    <td class="py-3 text-gray-400 text-xs">{{ res.start_time.strftime('%d.%m %H:%M') }} – {{ res.end_time.strftime('%H:%M') }}</td>
+                    <td class="py-3 font-bold text-blue-600">{{ res.total_price }} EUR</td>
+                    <td class="py-3">
+                        <span class="text-xs px-2.5 py-1 rounded-full font-semibold
+                            {% if res.status == 'confirmed' %}bg-green-100 text-green-700
+                            {% elif res.status == 'cancelled' %}bg-red-100 text-red-600
+                            {% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ res.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="text-center py-10 text-gray-400 text-sm">Nicio rezervare încă.</div>
+    {% endif %}
+</div>
+
+{% endblock %}

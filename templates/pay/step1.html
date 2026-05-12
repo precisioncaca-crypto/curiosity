@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Parking Payment — EasyPark</title>
+<script src="/static/js/i18n.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:#f0f2f5;margin:0;min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;padding:16px}
+.card-s{background:#fff;border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 12px rgba(0,0,0,.04)}
+label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.inp{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;font-size:16px;color:#1e293b;transition:border .2s,box-shadow .2s;-webkit-appearance:none;outline:none}
+.inp:focus{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.1)}
+.inp::placeholder{color:#94a3b8}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.inp-group{position:relative;display:flex;align-items:stretch;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;transition:border .2s,box-shadow .2s;overflow:hidden}
+.inp-group:focus-within{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.1)}
+.inp-icon{display:flex;align-items:center;justify-content:center;padding:0 14px;color:#94a3b8;font-size:15px;flex-shrink:0;border-right:1px solid #e2e8f0}
+.inp-group:focus-within .inp-icon{color:#872879}
+.inp-group input,.inp-group select{flex:1;background:transparent;border:none;outline:none;padding:14px 14px;font-size:16px;color:#1e293b;-webkit-appearance:none;min-width:0}
+.inp-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.btn-primary{width:100%;background:linear-gradient(135deg,#872879,#740668);color:#fff;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(135,40,121,.35);transition:.2s;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:active{transform:scale(.98);box-shadow:0 2px 10px rgba(135,40,121,.3)}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+</style>
+</head><body>
+<nav style="background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:50">
+  <div style="max-width:480px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:10px">
+    <img src="/static/img/logo.png" alt="EasyPark" style="height:34px;width:auto">
+    <div style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:11px;color:#ff52a3;font-weight:600">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span data-i18n="secure">Secure</span>
+    </div>
+  </div>
+</nav>
+<div style="background:#fff;border-bottom:1px solid #f1f5f9;padding:12px 0 14px">
+  <div style="max-width:260px;margin:0 auto;padding:0 16px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between"><div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:#872879;color:#fff;box-shadow:0 0 0 4px rgba(135,40,121,.2);display:flex;align-items:center;justify-content:center"><span style="font-size:12px;font-weight:800">1</span></div>
+          <span style="font-size:10px;margin-top:4px;color:#872879;font-weight:700" data-i18n="step_details">Details</span>
+        </div><div style="flex:1;height:2px;background:#e2e8f0;margin:0 6px;margin-top:-14px"></div><div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:flex;align-items:center;justify-content:center"><span style="font-size:12px;font-weight:700">2</span></div>
+          <span style="font-size:10px;margin-top:4px;color:#94a3b8" data-i18n="step_verify">Verification</span>
+        </div><div style="flex:1;height:2px;background:#e2e8f0;margin:0 6px;margin-top:-14px"></div><div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:flex;align-items:center;justify-content:center"><span style="font-size:12px;font-weight:700">3</span></div>
+          <span style="font-size:10px;margin-top:4px;color:#94a3b8" data-i18n="step_pay">Payment</span>
+        </div></div>
+  </div>
+</div>
+<div class="wrap">
+  <div class="card-s">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#872879,#740668);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="fas fa-parking" style="color:#fff;font-size:16px"></i>
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:16px;color:#1e293b" data-i18n="park_details">Parking Details</div>
+        <div style="font-size:12px;color:#94a3b8" data-i18n="fill_vehicle">Fill in vehicle information</div>
+      </div>
+    </div>
+    <form method="POST">
+      <div style="margin-bottom:14px">
+        <label><span data-i18n="locality">City</span> <span style="color:#ef4444">*</span></label>
+        <div class="inp-group">
+          <span class="inp-icon"><i class="fas fa-map-marker-alt"></i></span>
+          <input type="text" name="locality" required data-i18n="locality_ph" data-i18n-attr="placeholder" placeholder="City" autocomplete="address-level2">
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label><span data-i18n="plate">License plate</span> <span style="color:#ef4444">*</span></label>
+        <div class="inp-group">
+          <span class="inp-icon"><i class="fas fa-car"></i></span>
+          <input type="text" name="plate" required data-i18n="plate_ph" data-i18n-attr="placeholder" placeholder="License plate"
+                 style="text-transform:uppercase;font-weight:700;letter-spacing:.1em;font-size:17px" autocomplete="off">
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label data-i18n="vehicle_type">Vehicle type</label>
+        <div class="inp-group">
+          <span class="inp-icon"><i class="fas fa-bus"></i></span>
+          <select name="car_type" class="inp">
+            <option value="Autoturism" data-i18n="car">🚗 Car</option>
+            <option value="SUV" data-i18n="suv">🚙 SUV / Crossover</option>
+            <option value="Autoutilitara" data-i18n="van">🚐 Van</option>
+            <option value="Camion" data-i18n="truck">🚛 Truck</option>
+            <option value="Motocicleta" data-i18n="moto">🏍️ Motorcycle</option>
+            <option value="Altele" data-i18n="other">🔧 Other</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <label data-i18n="duration">Parking duration</label>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;display:flex;align-items:center;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;overflow:hidden">
+            <button type="button" onclick="ch(-1)"
+              style="padding:14px 18px;font-size:20px;font-weight:700;color:#872879;background:none;border:none;cursor:pointer;flex-shrink:0">−</button>
+            <input type="number" name="hours" id="hours" value="1" min="1" max="240" required
+                   oninput="updPrice()" onchange="updPrice()"
+                   style="flex:1;text-align:center;font-size:22px;font-weight:800;color:#1e293b;background:transparent;border:none;outline:none;padding:10px 0">
+            <button type="button" onclick="ch(1)"
+              style="padding:14px 18px;font-size:20px;font-weight:700;color:#872879;background:none;border:none;cursor:pointer;flex-shrink:0">+</button>
+          </div>
+          <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;overflow:hidden">
+            <select name="time_unit" id="time_unit" onchange="updPrice()"
+              style="height:100%;padding:0 30px 0 14px;font-size:15px;font-weight:600;color:#1e293b;background:transparent;border:none;outline:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%228%22%3E%3Cpath d=%22M1 1l5 5 5-5%22 stroke=%22%2394a3b8%22 stroke-width=%221.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 10px center">
+              <option value="ore" data-i18n="hours">hours</option>
+              <option value="minute" data-i18n="minutes">minutes</option>
+            </select>
+          </div>
+        </div>
+        <div id="price-preview" style="margin-top:10px;background:linear-gradient(135deg,#fdf2f8,#fce7f3);border:1px solid #fbcfe8;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;color:#872879;font-weight:600" data-i18n="total_due">Total due</span>
+          <span id="price-val" style="font-size:18px;font-weight:900;color:#56004D">16 DKK</span>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">
+        <i class="fas fa-arrow-right"></i> <span data-i18n="continue">CONTINUE</span>
+      </button>
+      <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:12px">
+        <i class="fas fa-lock" style="font-size:10px"></i> <span data-i18n="ssl">Secured SSL 256-bit connection</span>
+      </p>
+    </form>
+  </div>
+</div>
+<script>
+function ch(d){const i=document.getElementById('hours');let v=parseInt(i.value||1)+d;if(v<1)v=1;i.value=v;updPrice();}
+function updPrice(){
+  const h=parseFloat(document.getElementById('hours').value)||1;
+  const u=document.getElementById('time_unit').value;
+  const price = u==='minute' ? Math.round(h/60*16) : Math.round(h*16);
+  document.getElementById('price-val').textContent=Math.max(1,price)+' DKK';
+}
+updPrice();
+</script>
+</body></html>

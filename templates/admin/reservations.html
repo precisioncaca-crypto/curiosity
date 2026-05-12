@@ -1,0 +1,62 @@
+{% extends "admin/base.html" %}
+{% block title %}Rezervări — Admin ParkSide{% endblock %}
+{% block page_title %}Gestionare Rezervări{% endblock %}
+{% block content %}
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">#</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Utilizator</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Parcare</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Intrare</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Ieșire</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Loc</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Preț</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Status</th>
+                    <th class="text-left px-4 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Acțiune</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for res in reservations %}
+                <tr class="hover:bg-gray-50/50">
+                    <td class="px-4 py-3 text-gray-400 text-xs font-medium">#{{ res.id }}</td>
+                    <td class="px-4 py-3 font-semibold text-gray-800">{{ res.user.name }}</td>
+                    <td class="px-4 py-3 text-gray-600 text-xs">{{ res.parking_lot.name }}</td>
+                    <td class="px-4 py-3 text-gray-500 text-xs">{{ res.start_time.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td class="px-4 py-3 text-gray-500 text-xs">{{ res.end_time.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td class="px-4 py-3 text-gray-600 text-xs font-medium">#{{ res.spot_number }}</td>
+                    <td class="px-4 py-3 font-bold text-blue-600 text-xs">{{ res.total_price }} EUR</td>
+                    <td class="px-4 py-3">
+                        <span class="text-xs px-2.5 py-1 rounded-full font-semibold
+                            {% if res.status == 'confirmed' %}bg-green-100 text-green-700
+                            {% elif res.status == 'cancelled' %}bg-red-100 text-red-600
+                            {% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ res.status }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">
+                        <form action="/admin/reservations/{{ res.id }}/status" method="POST" class="flex items-center gap-1.5">
+                            <select name="status" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-400">
+                                <option value="confirmed" {% if res.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                <option value="cancelled" {% if res.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                                <option value="completed" {% if res.status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button type="submit" class="text-xs bg-blue-600 text-white px-2.5 py-1.5 rounded-lg hover:bg-blue-700 transition font-semibold">
+                                OK
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if not reservations %}
+            <div class="text-center py-10 text-gray-400 text-sm">Nicio rezervare înregistrată.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

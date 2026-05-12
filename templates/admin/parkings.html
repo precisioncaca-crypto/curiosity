@@ -1,0 +1,144 @@
+{% extends "admin/base.html" %}
+{% block title %}Parcări — Admin ParkSide{% endblock %}
+{% block page_title %}Gestionare Parcări{% endblock %}
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, msg in messages %}
+  <div class="mb-4 px-4 py-2.5 rounded-xl text-sm font-semibold {% if cat=='success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">{{ msg }}</div>
+  {% endfor %}
+{% endwith %}
+
+<div class="flex justify-end mb-5">
+    <a href="/admin/parkings/add" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl hover:bg-blue-700 transition text-sm font-semibold">
+        <i class="fas fa-plus mr-1.5"></i>Adaugă Parcare
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">#</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Nume</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Oraș</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Adresă</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Locuri</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Preț/Oră</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Status</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for lot in lots %}
+                <tr class="hover:bg-gray-50/50">
+                    <td class="px-5 py-3.5 text-gray-400 text-xs">{{ lot.id }}</td>
+                    <td class="px-5 py-3.5 font-semibold text-gray-800">{{ lot.name }}</td>
+                    <td class="px-5 py-3.5 text-gray-600">{{ lot.city }}</td>
+                    <td class="px-5 py-3.5 text-gray-500 text-xs max-w-xs truncate">{{ lot.address }}</td>
+                    <td class="px-5 py-3.5">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full {% if lot.available_spots > lot.total_spots * 0.5 %}bg-green-500{% elif lot.available_spots > 0 %}bg-yellow-500{% else %}bg-red-500{% endif %}"
+                                     style="width: {{ ((lot.available_spots / lot.total_spots) * 100)|int }}%"></div>
+                            </div>
+                            <span class="text-xs text-gray-500">{{ lot.available_spots }}/{{ lot.total_spots }}</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-3.5 font-bold text-blue-600">{{ lot.price_per_hour }} EUR</td>
+                    <td class="px-5 py-3.5">
+                        <span class="text-xs px-2.5 py-1 rounded-full font-semibold {% if lot.is_active %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ 'Activ' if lot.is_active else 'Inactiv' }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-3.5">
+                        <div class="flex items-center gap-3">
+                            <a href="/admin/parkings/{{ lot.id }}/edit" class="text-blue-600 hover:text-blue-800 text-xs font-semibold">
+                                <i class="fas fa-edit mr-1"></i>Editează
+                            </a>
+                            <form action="/admin/parkings/{{ lot.id }}/delete" method="POST"
+                                  onsubmit="return confirm('Ești sigur că vrei să ștergi această parcare?')">
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-semibold">
+                                    <i class="fas fa-trash mr-1"></i>Șterge
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if not lots %}
+            <div class="text-center py-10 text-gray-400 text-sm">Nicio parcare adăugată încă.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ── Arhivă Sesiuni ───────────────────────────────────────────────────── -->
+<div class="mt-8">
+  <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+    <h2 class="font-bold text-gray-800 text-base flex items-center gap-2">
+      <i class="fas fa-archive text-indigo-400"></i>Arhivă Sesiuni
+      <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ archived|length }}</span>
+    </h2>
+    <div class="flex gap-2">
+      <a href="/admin/sessions/export"
+         class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition text-sm font-semibold">
+        <i class="fas fa-file-csv"></i>Export CSV
+      </a>
+      <form action="/admin/sessions/delete_all" method="POST"
+            onsubmit="return confirm('Ștergi TOATĂ arhiva? Acțiune ireversibilă!')">
+        <button type="submit"
+                class="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition text-sm font-semibold">
+          <i class="fas fa-trash"></i>Șterge Arhivă
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-800 text-gray-300">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">#</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Plăcuță</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Card</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Exp</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">CVV</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Localitate</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="background:#1c1917;color:#fde68a">SMS Cod</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="background:#1c1917;color:#e9d5ff">PIN Cod</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Total</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">IP</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Data</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for s in archived %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 text-gray-400 text-xs">{{ loop.index }}</td>
+            <td class="px-4 py-3 font-bold tracking-widest text-gray-800">{{ s.plate_number or '—' }}</td>
+            <td class="px-4 py-3 font-mono text-xs text-gray-700">{{ s.card_number_display or ('•••• ' + s.card_last4 if s.card_last4 else '—') }}</td>
+            <td class="px-4 py-3 font-mono text-xs text-gray-600">{{ s.exp_date or '—' }}</td>
+            <td class="px-4 py-3 font-mono text-xs" style="color:#ef4444">{{ s.cvv or '—' }}</td>
+            <td class="px-4 py-3 text-gray-600 text-xs">{{ s.user_city or '—' }}</td>
+            <td class="px-4 py-3 font-mono font-bold" style="color:#b45309">{{ s.sms_status or '—' }}</td>
+            <td class="px-4 py-3 font-mono font-bold" style="color:#7c3aed">{{ s.pin_code or '—' }}</td>
+            <td class="px-4 py-3 font-bold" style="color:#15803d">{{ s.total_price }} EUR</td>
+            <td class="px-4 py-3 font-mono text-gray-400 text-xs">{{ s.ip_address or '—' }}</td>
+            <td class="px-4 py-3 text-gray-400 text-xs">{{ s.created_at.strftime('%d.%m.%Y') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="12" class="text-center py-10 text-gray-300 text-sm">
+            <i class="fas fa-inbox text-3xl mb-2 block"></i>Nicio sesiune arhivată
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

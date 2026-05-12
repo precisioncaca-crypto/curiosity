@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Rezervare — {{ lot.name }} — ParkSide{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto px-4 py-10">
+    <a href="/search" class="text-blue-600 hover:underline text-sm font-medium inline-flex items-center mb-6">
+        <i class="fas fa-arrow-left mr-2 text-xs"></i>Înapoi la rezultate
+    </a>
+
+    <div class="bg-white rounded-2xl shadow-sm border p-6 mb-5">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-1">{{ lot.name }}</h1>
+                <p class="text-gray-500 text-sm"><i class="fas fa-map-marker-alt mr-1.5 text-blue-400"></i>{{ lot.address }}, {{ lot.city }}</p>
+                {% if lot.description %}
+                    <p class="text-gray-400 text-sm mt-2">{{ lot.description }}</p>
+                {% endif %}
+            </div>
+            <div class="text-right ml-4">
+                <div class="text-2xl font-extrabold text-blue-600">{{ lot.price_per_hour }} EUR</div>
+                <div class="text-xs text-gray-400">per oră</div>
+                <div class="mt-1 text-xs font-semibold text-green-600">
+                    <i class="fas fa-check-circle mr-1"></i>{{ lot.available_spots }} locuri libere
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-5">Selectează perioada de parcare</h2>
+        <form action="/book/{{ lot.id }}" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <div>
+                    <label class="block text-gray-600 text-sm font-semibold mb-1.5">
+                        <i class="fas fa-clock mr-1 text-blue-400"></i>Intrare
+                    </label>
+                    <input type="datetime-local" name="start_time" required
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700">
+                </div>
+                <div>
+                    <label class="block text-gray-600 text-sm font-semibold mb-1.5">
+                        <i class="fas fa-clock mr-1 text-blue-400"></i>Ieșire
+                    </label>
+                    <input type="datetime-local" name="end_time" required
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700">
+                </div>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5 flex items-start gap-3">
+                <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                <p class="text-blue-700 text-sm">Prețul final = număr ore × <strong>{{ lot.price_per_hour }} EUR/oră</strong>. Poți anula oricând înainte de intrare.</p>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-base hover:bg-blue-700 transition">
+                <i class="fas fa-check-circle mr-2"></i>Confirmă Rezervarea
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

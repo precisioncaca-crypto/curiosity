@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+{% block title %}Utilizatori — Admin ParkSide{% endblock %}
+{% block page_title %}Utilizatori Înregistrați{% endblock %}
+{% block content %}
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">#</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Nume</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Email</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Rezervări</th>
+                    <th class="text-left px-5 py-3.5 text-gray-400 font-semibold text-xs uppercase tracking-wide">Înregistrat la</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for user in users %}
+                <tr class="hover:bg-gray-50/50">
+                    <td class="px-5 py-3.5 text-gray-400 text-xs">{{ user.id }}</td>
+                    <td class="px-5 py-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center text-xs font-bold text-blue-600">
+                                {{ user.name[0]|upper }}
+                            </div>
+                            <span class="font-semibold text-gray-800">{{ user.name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-3.5 text-gray-500 text-sm">{{ user.email }}</td>
+                    <td class="px-5 py-3.5">
+                        <span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                            {{ user.reservations|length }} rezervări
+                        </span>
+                    </td>
+                    <td class="px-5 py-3.5 text-gray-400 text-xs">{{ user.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if not users %}
+            <div class="text-center py-10 text-gray-400 text-sm">Niciun utilizator înregistrat.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

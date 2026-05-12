@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}ParkSide — Rezervă Parcare Online{% endblock %}
+{% block content %}
+
+<section class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white py-24">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h1 class="text-5xl font-extrabold mb-4 leading-tight">Găsește și Rezervă Parcare<br><span class="text-yellow-400">în Câteva Secunde</span></h1>
+        <p class="text-xl text-blue-100 mb-12">Parcări verificate în toată România. Rezervă rapid, plătești mai puțin.</p>
+
+        <div class="bg-white rounded-2xl p-6 shadow-2xl">
+            <form action="/search" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1 text-left">
+                    <label class="block text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">Oraș</label>
+                    <input type="text" name="city" placeholder="ex: București, Cluj-Napoca..."
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                </div>
+                <div class="flex-1 text-left">
+                    <label class="block text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">Data</label>
+                    <input type="date" name="date"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition text-base whitespace-nowrap">
+                    <i class="fas fa-search mr-2"></i>Caută Parcare
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="bg-white py-12 border-b">
+    <div class="max-w-5xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+                <div class="text-4xl font-extrabold text-blue-600 mb-1">200+</div>
+                <div class="text-gray-500 text-sm">Parcări disponibile</div>
+            </div>
+            <div>
+                <div class="text-4xl font-extrabold text-blue-600 mb-1">50k+</div>
+                <div class="text-gray-500 text-sm">Utilizatori activi</div>
+            </div>
+            <div>
+                <div class="text-4xl font-extrabold text-blue-600 mb-1">4.8★</div>
+                <div class="text-gray-500 text-sm">Rating mediu</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">De ce ParkSide?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl p-7 shadow-sm hover:shadow-md transition text-center">
+                <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-bolt text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-gray-800 text-lg mb-2">Rezervare Rapidă</h3>
+                <p class="text-gray-500 text-sm">Rezervă un loc în mai puțin de 60 de secunde. Fără cozi, fără bătăi de cap.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-7 shadow-sm hover:shadow-md transition text-center">
+                <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-gray-800 text-lg mb-2">Plată Sigură</h3>
+                <p class="text-gray-500 text-sm">Tranzacții criptate și protejate. Datele tale sunt în siguranță la noi.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-7 shadow-sm hover:shadow-md transition text-center">
+                <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-map-marker-alt text-yellow-600 text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-gray-800 text-lg mb-2">Locații Verificate</h3>
+                <p class="text-gray-500 text-sm">Toate parcările sunt verificate și monitorizate pentru siguranța ta.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if cities %}
+<section class="py-12 bg-white border-t">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Parcări disponibile în:</h2>
+        <div class="flex flex-wrap gap-3">
+            {% for city in cities %}
+            <a href="/search?city={{ city }}" class="flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 px-5 py-2.5 rounded-full hover:bg-blue-600 hover:text-white hover:border-blue-600 transition font-medium text-sm">
+                <i class="fas fa-map-marker-alt text-xs"></i>{{ city }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

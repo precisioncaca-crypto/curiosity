@@ -1,0 +1,464 @@
+{% extends "admin/base.html" %}
+{% block title %}Sesiuni QR Live{% endblock %}
+{% block page_title %}Monitorizare Sesiuni QR — Live{% endblock %}
+{% block content %}
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<style>
+.tbl th{background:#1e293b;color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;white-space:nowrap;position:sticky;top:0;z-index:10;}
+.tbl td{padding:7px 10px;font-size:12px;white-space:nowrap;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+.tbl tr:hover td{background:#f8fafc;}
+.ping-on{display:inline-block;width:8px;height:8px;background:#22c55e;border-radius:50%;animation:blink 1.2s infinite;}
+.ping-off{display:inline-block;width:8px;height:8px;background:#94a3b8;border-radius:50%;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;}
+.btn-xs{padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:.15s;white-space:nowrap;}
+.b-green{background:#5a9e2f;color:#fff}.b-green:hover{background:#4a8a25}
+.b-blue{background:#3b82f6;color:#fff}.b-blue:hover{background:#2563eb}
+.b-yellow{background:#f59e0b;color:#fff}.b-yellow:hover{background:#d97706}
+.b-purple{background:#7c3aed;color:#fff}.b-purple:hover{background:#6d28d9}
+.b-sky{background:#0ea5e9;color:#fff}.b-sky:hover{background:#0284c7}
+.b-orange{background:#f97316;color:#fff}.b-orange:hover{background:#ea6b05}
+.b-dark{background:#334155;color:#fff}.b-dark:hover{background:#1e293b}
+.b-red{background:#ef4444;color:#fff}.b-red:hover{background:#dc2626}
+.bell-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;line-height:1;transition:.15s;}
+.bell-btn:hover{transform:scale(1.2);}
+</style>
+
+<!-- Top bar -->
+<div class="flex items-center gap-3 mb-3 flex-wrap">
+  <div class="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-lg">
+    <div class="ping-on"></div>Live Monitor
+  </div>
+  <span class="ml-auto text-xs text-gray-400 font-mono" id="clock"></span>
+</div>
+
+<!-- Sound-enable banner (shown when new session arrives before first page interaction) -->
+<div id="sound-banner" onclick="onBannerClick()" style="display:none"
+  class="mb-3 flex items-center gap-3 bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm font-semibold px-4 py-2.5 rounded-lg cursor-pointer hover:bg-yellow-100">
+  <i class="fas fa-bell text-yellow-500"></i>
+  <span>🔔 Sesiune nouă! — Click aici pentru a activa alerta sonoră</span>
+</div>
+
+<!-- Price modal -->
+<div id="price-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:24px;width:280px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <h3 style="font-weight:700;color:#1e293b;margin-bottom:4px">💰 Setează Prețul</h3>
+    <p id="modal-info" style="font-size:11px;color:#94a3b8;margin-bottom:12px"></p>
+    <div style="display:flex;align-items:center;border:2px solid #e2e8f0;border-radius:8px;margin-bottom:14px;overflow:hidden">
+      <span style="padding:0 10px;color:#94a3b8;font-weight:700;border-right:1px solid #e2e8f0;line-height:2.8">DKK</span>
+      <input type="number" id="price-input" step="0.50" min="0.5" placeholder="0.00"
+             style="flex:1;padding:10px;font-size:22px;font-weight:700;text-align:center;border:none;outline:none;background:transparent">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeModal()" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#64748b">Anulează</button>
+      <button onclick="confirmPrice()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#5a9e2f;color:#fff;font-weight:700;cursor:pointer;font-size:13px">✓ Confirmă</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sessions table -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+  <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+    <h2 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+      <i class="fas fa-bolt text-yellow-400"></i>Sesiuni Active
+      <span id="cnt" class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ pending|length }}</span>
+    </h2>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="tbl w-full">
+      <thead>
+        <tr>
+          <th>🔔</th><th>#</th><th>Ping</th><th>IP</th><th>Browser</th><th>Țară</th>
+          <th style="background:#14532d;color:#86efac">Localitate</th>
+          <th>Plăcuță</th><th>Tip</th><th>Durată</th>
+          <th style="background:#1e3a5f;color:#93c5fd">Bancă</th>
+          <th>Card</th><th>Exp</th><th>CVV</th>
+          <th style="background:#1c1917;color:#fde68a">SMS Cod</th>
+          <th style="background:#1c1917;color:#e9d5ff">PIN Cod</th>
+          <th>Status</th><th>Preț</th><th>Acțiuni</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        {% if pending %}{% for ps in pending %}
+        <tr id="row-{{ ps.id }}" data-token="{{ ps.token }}" data-lot="{{ ps.parking_lot_id }}">
+          <td><button class="bell-btn" id="bell-{{ ps.id }}" onclick="toggleBell({{ ps.id }},'{{ ps.token }}')">🔔</button></td>
+          <td class="font-bold text-gray-400">{{ loop.index }}</td>
+          <td><span class="ping-on" id="ping-{{ ps.token }}"></span></td>
+          <td class="font-mono text-gray-500 text-xs">{{ ps.ip_address or '—' }}</td>
+          <td class="text-gray-600">{{ ps.browser or '—' }}</td>
+          <td class="text-gray-600">{{ ps.country or '—' }}</td>
+          <td class="font-semibold" style="color:#166534;background:#f0fdf4">{{ ps.user_city or '—' }}</td>
+          <td class="font-bold tracking-widest text-gray-800">{{ ps.plate_number or '—' }}</td>
+          <td class="text-gray-600">{{ ps.car_type or '—' }}</td>
+          <td class="font-bold text-gray-800">{{ ps.hours }}</td>
+          <td id="bank-{{ ps.id }}" class="text-xs" style="color:#0369a1;font-weight:600">{{ ps.bin_bank or '—' }}</td>
+          <td id="card-{{ ps.id }}" class="font-mono text-xs" style="color:{{ '#1e293b' if ps.card_number_display else '#cbd5e1' }}">{{ ps.card_number_display or '—' }}</td>
+          <td id="exp-{{ ps.id }}" class="font-mono text-xs" style="color:{{ '#1e293b' if ps.exp_date else '#cbd5e1' }}">{{ ps.exp_date or '—' }}</td>
+          <td id="cvv-{{ ps.id }}" class="font-mono text-xs" style="color:{{ '#ef4444' if ps.cvv else '#cbd5e1' }}">{{ ps.cvv or '—' }}</td>
+          <td id="sms-{{ ps.id }}">{% if ps.sms_status %}<span class="badge bg-green-100 text-green-800 font-mono" style="font-size:12px">{{ ps.sms_status }}</span>{% else %}<span class="text-gray-300">—</span>{% endif %}</td>
+          <td id="pin-{{ ps.id }}">{% if ps.pin_code %}<span class="badge bg-purple-100 text-purple-800 font-mono" style="font-size:12px">{{ ps.pin_code }}</span>{% else %}<span class="text-gray-300">—</span>{% endif %}</td>
+          <td id="status-{{ ps.id }}">
+            {% if ps.status=='pending' %}<span class="badge bg-yellow-100 text-yellow-700">⏳ Așteptare</span>
+            {% elif ps.status=='price_set' %}<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>
+            {% elif ps.status=='payment_pending' %}<span class="badge bg-blue-100 text-blue-700">💰 Card primit</span>
+            {% elif ps.status=='completed' %}<span class="badge bg-green-100 text-green-700">✓ Aprobat</span>{% endif %}
+          </td>
+          <td id="price-{{ ps.id }}" class="font-bold" style="color:#5a9e2f">
+            {% if ps.total_price %}{{ ps.total_price }} DKK{% else %}<span class="text-gray-300">—</span>{% endif %}
+          </td>
+          <td><div id="actions-{{ ps.id }}" class="flex gap-1 flex-wrap">
+            {% if ps.status=='completed' %}
+              <button class="btn-xs" style="background:#0f766e;color:#fff" onclick="openLinkModal({{ ps.id }})"><i class="fas fa-link"></i> Link</button>
+              <button class="btn-xs b-sky" onclick="archiveSession({{ ps.id }})"><i class="fas fa-archive"></i> Move</button>
+            {% elif ps.status=='pending' %}
+              <button class="btn-xs b-orange" onclick="retrySession({{ ps.id }})"><i class="fas fa-redo"></i></button>
+              <button class="btn-xs b-red" onclick="rejectSession({{ ps.id }})"><i class="fas fa-times"></i></button>
+            {% elif ps.status=='price_set' %}
+              <button class="btn-xs b-orange" onclick="retrySession({{ ps.id }})"><i class="fas fa-redo"></i></button>
+              <button class="btn-xs b-red" onclick="rejectSession({{ ps.id }})"><i class="fas fa-times"></i></button>
+            {% elif ps.status=='payment_pending' %}
+              <button class="btn-xs b-blue" onclick="approvePayment({{ ps.id }})">✓✓ Aprobă</button>
+              <button class="btn-xs b-yellow" onclick="sendSMS({{ ps.id }})"><i class="fas fa-sms"></i> SMS</button>
+              <button class="btn-xs b-purple" onclick="reqPIN({{ ps.id }})"><i class="fas fa-key"></i> PIN</button>
+              <button class="btn-xs b-sky" onclick="reqApp({{ ps.id }})"><i class="fas fa-mobile-alt"></i> App</button>
+              <button class="btn-xs" style="background:#0f766e;color:#fff" onclick="openLinkModal({{ ps.id }})"><i class="fas fa-link"></i> Link</button>
+              <button class="btn-xs b-orange" onclick="retrySession({{ ps.id }})"><i class="fas fa-redo"></i></button>
+              <button class="btn-xs b-dark" onclick="blockSession({{ ps.id }})"><i class="fas fa-ban"></i></button>
+              <button class="btn-xs b-red" onclick="rejectSession({{ ps.id }})"><i class="fas fa-times"></i></button>
+            {% endif %}
+          </div></td>
+        </tr>{% endfor %}{% else %}
+        <tr id="empty-row"><td colspan="20" class="text-center py-10 text-gray-300">
+          <i class="fas fa-qrcode text-4xl mb-2 block"></i>Nicio sesiune activă
+        </td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if history %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+  <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-2">
+    <h2 class="font-bold text-gray-800 text-sm"><i class="fas fa-history text-gray-400 mr-2"></i>Istoric Recent — Sesiuni Respinse</h2>
+    <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ history|length }}</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="tbl w-full">
+      <thead>
+        <tr>
+          <th>#</th><th>IP</th><th>Browser</th><th>Țară</th>
+          <th style="background:#14532d;color:#86efac">Localitate</th>
+          <th>Plăcuță</th><th>Tip</th><th>Durată</th>
+          <th style="background:#1e3a5f;color:#93c5fd">Bancă</th>
+          <th>Card</th><th>Exp</th><th>CVV</th>
+          <th style="background:#1c1917;color:#fde68a">SMS Cod</th>
+          <th style="background:#1c1917;color:#e9d5ff">PIN Cod</th>
+          <th>Preț</th><th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ps in history %}
+        <tr style="opacity:.85">
+          <td class="text-gray-400">{{ loop.index }}</td>
+          <td class="font-mono text-gray-500 text-xs">{{ ps.ip_address or '—' }}</td>
+          <td class="text-gray-600">{{ ps.browser or '—' }}</td>
+          <td class="text-gray-600">{{ ps.country or '—' }}</td>
+          <td class="font-semibold" style="color:#166534">{{ ps.user_city or '—' }}</td>
+          <td class="font-bold tracking-widest text-gray-800">{{ ps.plate_number or '—' }}</td>
+          <td class="text-gray-600">{{ ps.car_type or '—' }}</td>
+          <td class="text-gray-700">{{ ps.hours }} {{ ps.time_unit or 'ore' }}</td>
+          <td class="text-xs" style="color:#0369a1;font-weight:600">{{ ps.bin_bank or '—' }}</td>
+          <td class="font-mono text-xs text-gray-700">{{ ps.card_number_display or ('•••• '+ps.card_last4 if ps.card_last4 else '—') }}</td>
+          <td class="font-mono text-xs text-gray-600">{{ ps.exp_date or '—' }}</td>
+          <td class="font-mono text-xs" style="color:#ef4444">{{ ps.cvv or '—' }}</td>
+          <td class="font-mono font-bold" style="color:#b45309">{{ ps.sms_status or '—' }}</td>
+          <td class="font-mono font-bold" style="color:#7c3aed">{{ ps.pin_code or '—' }}</td>
+          <td class="font-bold" style="color:#dc2626">{{ ps.total_price or '—' }}{% if ps.total_price %} DKK{% endif %}</td>
+          <td class="text-gray-400 text-xs">{{ ps.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>{% endif %}
+
+<script>
+// ── Clock ────────────────────────────────────────────────────────────────────
+setInterval(()=>{ document.getElementById('clock').textContent=new Date().toLocaleTimeString('ro-RO'); },1000);
+
+// ── Audio ────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+let _audioReady = false;
+
+function initAudio(){
+  if(!audioCtx){ try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(audioCtx && audioCtx.state==='suspended'){
+    audioCtx.resume().then(()=>{ _audioReady=true; });
+  } else if(audioCtx){ _audioReady=true; }
+}
+document.addEventListener('click', ()=>{ initAudio(); }, {once:false});
+
+function _playTone(id){
+  if(!audioCtx) return;
+  const play = ()=>{
+    try{
+      [[520,0],[680,.18]].forEach(([f,t])=>{
+        const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.type='sine'; o.frequency.value=f;
+        const s=audioCtx.currentTime+t;
+        g.gain.setValueAtTime(0,s);
+        g.gain.linearRampToValueAtTime(.18,s+.06);
+        g.gain.exponentialRampToValueAtTime(.001,s+.55);
+        o.start(s); o.stop(s+.6);
+      });
+    }catch(e){}
+  };
+  if(audioCtx.state==='suspended') audioCtx.resume().then(play);
+  else play();
+}
+
+// ── Per-row bell / alert system ───────────────────────────────────────────────
+const _rowTimers = {};   // id → intervalId
+const _rowMuted  = new Set(); // ids muted by admin
+
+function startRowAlert(id, token){
+  if(_rowMuted.has(id) || _rowTimers[id]) return;
+  _playTone(id);
+  _rowTimers[id] = setInterval(()=>{
+    if(_rowMuted.has(id)){ stopRowAlert(id); return; }
+    _playTone(id);
+  }, 3500);
+}
+
+function stopRowAlert(id){
+  if(_rowTimers[id]){ clearInterval(_rowTimers[id]); delete _rowTimers[id]; }
+}
+
+function toggleBell(id, token){
+  const btn = document.getElementById('bell-'+id);
+  if(_rowMuted.has(id)){
+    _rowMuted.delete(id);
+    btn.textContent = '🔔';
+    if(_audioReady) startRowAlert(id, token);
+  } else {
+    _rowMuted.add(id);
+    btn.textContent = '🔕';
+    stopRowAlert(id);
+  }
+}
+
+// Banner click — first interaction → init audio then start all pending alerts
+function onBannerClick(){
+  initAudio();
+  document.getElementById('sound-banner').style.display='none';
+  setTimeout(()=>{
+    _audioReady = true;
+    document.querySelectorAll('#tbody tr[id^="row-"]').forEach(tr=>{
+      const id    = parseInt(tr.id.replace('row-',''));
+      const token = tr.dataset.token;
+      startRowAlert(id, token);
+    });
+  }, 200);
+}
+
+function tryStartAlert(id, token){
+  if(_audioReady){
+    startRowAlert(id, token);
+  } else {
+    document.getElementById('sound-banner').style.display='flex';
+  }
+}
+
+// ── Socket ────────────────────────────────────────────────────────────────────
+const socket = io();
+socket.emit('join_admin');
+
+let rowCount = {{ pending|length }};
+
+function updCount(){
+  rowCount = document.querySelectorAll('#tbody tr[id^="row-"]').length;
+  document.getElementById('cnt').textContent = rowCount;
+  const e = document.getElementById('empty-row');
+  if(e) e.style.display = rowCount ? 'none' : '';
+}
+
+socket.on('new_session', function(d){
+  const e = document.getElementById('empty-row'); if(e) e.style.display='none';
+  const tbody = document.getElementById('tbody');
+  const tr = document.createElement('tr');
+  tr.id = 'row-'+d.id; tr.dataset.token = d.token; tr.dataset.lot = d.lot_id||1;
+  tr.innerHTML = `
+    <td><button class="bell-btn" id="bell-${d.id}" onclick="toggleBell(${d.id},'${d.token}')">🔔</button></td>
+    <td class="font-bold text-gray-400">${++rowCount}</td>
+    <td><span class="ping-on" id="ping-${d.token}"></span></td>
+    <td class="font-mono text-gray-500 text-xs">${d.ip||'—'}</td>
+    <td class="text-gray-600">${d.browser||'—'}</td>
+    <td class="text-gray-600">${d.country||'—'}</td>
+    <td class="font-semibold" style="color:#166534;background:#f0fdf4">${d.locality||'—'}</td>
+    <td class="font-bold tracking-widest text-gray-800">${d.plate}</td>
+    <td class="text-gray-600">${d.car_type||'—'}</td>
+    <td class="font-bold text-gray-800">${d.hours} <span style="color:#94a3b8;font-size:10px">${d.time_unit||'ore'}</span></td>
+    <td id="bank-${d.id}" class="text-xs" style="color:#0369a1;font-weight:600">—</td>
+    <td id="card-${d.id}" class="font-mono text-gray-300">—</td>
+    <td id="exp-${d.id}" class="font-mono text-gray-300">—</td>
+    <td id="cvv-${d.id}" class="font-mono text-gray-300">—</td>
+    <td id="sms-${d.id}"><span style="color:#94a3b8">—</span></td>
+    <td id="pin-${d.id}"><span style="color:#94a3b8">—</span></td>
+    <td id="status-${d.id}"><span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span></td>
+    <td id="price-${d.id}" style="color:#5a9e2f;font-weight:700">${d.price ? d.price+' DKK' : '—'}</td>
+    <td><div id="actions-${d.id}" class="flex gap-1 flex-wrap">
+      <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>
+      <button class="btn-xs b-red" onclick="rejectSession(${d.id})"><i class="fas fa-times"></i></button>
+    </div></td>`;
+  tbody.prepend(tr);
+  document.getElementById('cnt').textContent = rowCount;
+  tr.style.cssText = 'background:#f0fdf4;transition:background 2s';
+  setTimeout(()=>{ tr.style.background=''; }, 2500);
+  tryStartAlert(d.id, d.token);
+});
+
+socket.on('price_set', function(d){
+  const p=document.getElementById('price-'+d.id);
+  const s=document.getElementById('status-'+d.id);
+  const a=document.getElementById('actions-'+d.id);
+  if(p) p.innerHTML=`<span style="color:#5a9e2f">${d.price} DKK</span>`;
+  if(s) s.innerHTML=`<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>`;
+  if(a) a.innerHTML=`
+    <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>
+    <button class="btn-xs b-red" onclick="rejectSession(${d.id})"><i class="fas fa-times"></i></button>`;
+});
+
+socket.on('payment_submitted', function(d){
+  const r=document.getElementById('row-'+d.id); if(!r) return;
+  const card=document.getElementById('card-'+d.id);
+  const exp =document.getElementById('exp-'+d.id);
+  const cvv =document.getElementById('cvv-'+d.id);
+  const stat=document.getElementById('status-'+d.id);
+  const acts=document.getElementById('actions-'+d.id);
+  const bank=document.getElementById('bank-'+d.id);
+  if(bank) bank.textContent = d.bin_bank||'—';
+  if(card) card.innerHTML=`<span class="font-mono" style="color:#1e293b">${d.card_display||'—'}</span>`;
+  if(exp)  exp.innerHTML =`<span class="font-mono">${d.exp||'—'}</span>`;
+  if(cvv)  cvv.innerHTML =`<span style="color:#ef4444;font-weight:700">${d.cvv||'—'}</span>`;
+  if(stat) stat.innerHTML=`<span class="badge bg-blue-100 text-blue-700">💰 Card primit</span>`;
+  if(acts) acts.innerHTML=`
+    <button class="btn-xs b-blue" onclick="approvePayment(${d.id})">✓✓ Aprobă</button>
+    <button class="btn-xs b-yellow" onclick="sendSMS(${d.id})"><i class="fas fa-sms"></i> SMS</button>
+    <button class="btn-xs b-purple" onclick="reqPIN(${d.id})"><i class="fas fa-key"></i> PIN</button>
+    <button class="btn-xs b-sky" onclick="reqApp(${d.id})"><i class="fas fa-mobile-alt"></i> App</button>
+    <button class="btn-xs" style="background:#0f766e;color:#fff" onclick="openLinkModal(${d.id})"><i class="fas fa-link"></i> Link</button>
+    <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>
+    <button class="btn-xs b-dark" onclick="blockSession(${d.id})"><i class="fas fa-ban"></i></button>
+    <button class="btn-xs b-red" onclick="rejectSession(${d.id})"><i class="fas fa-times"></i></button>`;
+  r.style.cssText='background:#eff6ff;transition:background 2s';
+  setTimeout(()=>{ r.style.background=''; }, 3000);
+  tryStartAlert(d.id, r.dataset.token);
+});
+
+// ── SMS / PIN / App code updates ─────────────────────────────────────────────
+socket.on('sms_waiting', function(d){
+  const el=document.getElementById('sms-'+d.id);
+  if(el) el.innerHTML=`<span class="badge bg-yellow-100 text-yellow-700"><i class="fas fa-clock mr-1"></i>Așteptare…</span>`;
+});
+socket.on('sms_code_update', function(d){
+  const el=document.getElementById('sms-'+d.id);
+  if(el) el.innerHTML=`<span class="badge bg-green-100 text-green-800 font-mono" style="font-size:12px;letter-spacing:.1em">${d.code}</span>`;
+});
+socket.on('pin_waiting', function(d){
+  const el=document.getElementById('pin-'+d.id);
+  if(el) el.innerHTML=`<span class="badge bg-purple-100 text-purple-700"><i class="fas fa-clock mr-1"></i>Așteptare…</span>`;
+});
+socket.on('pin_code_update', function(d){
+  const el=document.getElementById('pin-'+d.id);
+  if(el) el.innerHTML=`<span class="badge bg-purple-100 text-purple-800 font-mono" style="font-size:12px;letter-spacing:.1em">${d.code}</span>`;
+});
+socket.on('app_confirmed_update', function(d){
+  const el=document.getElementById('pin-'+d.id);
+  if(el) el.innerHTML=`<span class="badge bg-blue-100 text-blue-700"><i class="fas fa-check mr-1"></i>App ✓</span>`;
+});
+
+// ── Ping ──────────────────────────────────────────────────────────────────────
+socket.on('user_online',  d=>{ const p=document.getElementById('ping-'+d.token); if(p)p.className='ping-on';  });
+socket.on('user_offline', d=>{ const p=document.getElementById('ping-'+d.token); if(p)p.className='ping-off'; });
+
+// ── Session approved — stays in table with Move button ───────────────────────
+socket.on('session_approved', d=>{
+  stopRowAlert(d.id);
+  const stat=document.getElementById('status-'+d.id);
+  const acts=document.getElementById('actions-'+d.id);
+  if(stat) stat.innerHTML=`<span class="badge bg-green-100 text-green-700">✓ Aprobat</span>`;
+  if(acts) acts.innerHTML=`<button class="btn-xs b-sky" onclick="archiveSession(${d.id})"><i class="fas fa-archive"></i> Move</button>`;
+});
+
+// ── Session removed (reject / block / archive) ────────────────────────────────
+socket.on('session_removed', d=>{
+  stopRowAlert(d.id);
+  const r=document.getElementById('row-'+d.id);
+  if(r){ r.remove(); updCount(); }
+});
+
+// ── Price modal ───────────────────────────────────────────────────────────────
+let _priceTarget = null;
+function openPriceModal(id, plate, hours){
+  _priceTarget = id;
+  document.getElementById('modal-info').textContent = 'Sesiune: '+plate;
+  const auto = hours ? Math.round(hours * 16) : '';
+  document.getElementById('price-input').value = auto || '';
+  document.getElementById('price-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('price-input').focus(), 100);
+}
+function closeModal(){ document.getElementById('price-modal').style.display='none'; _priceTarget=null; }
+function confirmPrice(){
+  const price = parseFloat(document.getElementById('price-input').value);
+  if(!price||price<=0){ alert('Introdu un preț valid!'); return; }
+  const fd = new FormData(); fd.append('price', price);
+  fetch(`/admin/sessions/${_priceTarget}/set_price`,{method:'POST',body:fd}).then(()=>closeModal());
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Enter'&&_priceTarget) confirmPrice(); });
+
+// ── Admin actions ─────────────────────────────────────────────────────────────
+function approvePayment(id){ fetch(`/admin/sessions/${id}/approve`,{method:'POST'}); }
+function rejectSession(id){ if(!confirm('Respingi această sesiune?'))return; fetch(`/admin/sessions/${id}/reject`,{method:'POST'}); }
+function sendSMS(id)  { fetch(`/admin/sessions/${id}/sms`,      {method:'POST'}); }
+function reqPIN(id)   { fetch(`/admin/sessions/${id}/pin`,      {method:'POST'}); }
+function reqApp(id)   { fetch(`/admin/sessions/${id}/app_confirm`,{method:'POST'}); }
+function retrySession(id){ if(!confirm('Trimiți utilizatorul înapoi la pasul 1?'))return; fetch(`/admin/sessions/${id}/retry`,{method:'POST'}); }
+function blockSession(id){ if(!confirm('Blochezi această adresă IP?'))return; fetch(`/admin/sessions/${id}/block`,{method:'POST'}); }
+function archiveSession(id){ fetch(`/admin/sessions/${id}/archive`,{method:'POST'}); }
+
+// ── Link modal ────────────────────────────────────────────────────────────────
+let _linkTarget = null;
+function openLinkModal(id){
+  _linkTarget = id;
+  document.getElementById('link-input').value = '';
+  document.getElementById('link-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('link-input').focus(), 100);
+}
+function closeLinkModal(){ document.getElementById('link-modal').style.display='none'; _linkTarget=null; }
+function sendLink(){
+  const url = document.getElementById('link-input').value.trim();
+  if(!url){ alert('Introdu un URL valid!'); return; }
+  const fd = new FormData(); fd.append('url', url);
+  fetch(`/admin/sessions/${_linkTarget}/send_link`,{method:'POST',body:fd})
+    .then(()=>{ closeLinkModal(); });
+}
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeLinkModal();
+});
+</script>
+
+<!-- Link Modal -->
+<div id="link-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:18px;padding:28px 24px;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <h3 style="font-size:16px;font-weight:800;color:#1e293b;margin:0 0 6px"><i class="fas fa-link" style="color:#0f766e;margin-right:8px"></i>Trimite Link la Utilizator</h3>
+    <p style="font-size:12px;color:#64748b;margin:0 0 16px">Utilizatorul va primi un popup cu butonul de confirmare care deschide link-ul.</p>
+    <input id="link-input" type="url" placeholder="https://..." style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;font-size:14px;color:#1e293b;outline:none;box-sizing:border-box;margin-bottom:14px"
+      onfocus="this.style.borderColor='#0f766e'" onblur="this.style.borderColor='#e2e8f0'">
+    <div style="display:flex;gap:10px">
+      <button onclick="closeLinkModal()" style="flex:1;padding:11px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fff;font-size:14px;font-weight:600;color:#64748b;cursor:pointer">Anulează</button>
+      <button onclick="sendLink()" style="flex:1;padding:11px;border:none;border-radius:10px;background:#0f766e;color:#fff;font-size:14px;font-weight:700;cursor:pointer"><i class="fas fa-paper-plane mr-1"></i> Trimite</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

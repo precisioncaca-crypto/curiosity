@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Rezervările Mele — ParkSide{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="flex justify-between items-center mb-7">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Rezervările Mele</h1>
+            <p class="text-gray-500 text-sm mt-0.5">Bun venit, {{ current_user.name }}!</p>
+        </div>
+        <a href="/search" class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition text-sm font-semibold">
+            <i class="fas fa-plus mr-1.5"></i>Rezervare Nouă
+        </a>
+    </div>
+
+    {% if reservations %}
+        <div class="space-y-4">
+            {% for res in reservations %}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0
+                        {% if res.status == 'confirmed' %}bg-green-100{% elif res.status == 'cancelled' %}bg-red-100{% else %}bg-gray-100{% endif %}">
+                        <i class="fas fa-parking text-xl
+                            {% if res.status == 'confirmed' %}text-green-600{% elif res.status == 'cancelled' %}text-red-400{% else %}text-gray-400{% endif %}"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="font-bold text-gray-800">{{ res.parking_lot.name }}</h3>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold
+                                {% if res.status == 'confirmed' %}bg-green-100 text-green-700
+                                {% elif res.status == 'cancelled' %}bg-red-100 text-red-600
+                                {% else %}bg-gray-100 text-gray-500{% endif %}">
+                                {{ res.status|capitalize }}
+                            </span>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-0.5"><i class="fas fa-map-marker-alt mr-1 text-blue-400"></i>{{ res.parking_lot.address }}</p>
+                        <div class="flex flex-wrap gap-3 mt-1.5 text-xs text-gray-500">
+                            <span><i class="fas fa-calendar mr-1 text-blue-300"></i>{{ res.start_time.strftime('%d.%m.%Y %H:%M') }} → {{ res.end_time.strftime('%d.%m.%Y %H:%M') }}</span>
+                            <span><i class="fas fa-parking mr-1 text-blue-300"></i>Loc #{{ res.spot_number }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-3 md:gap-1 ml-auto">
+                    <span class="text-xl font-extrabold text-blue-600">{{ res.total_price }} EUR</span>
+                    {% if res.status == 'confirmed' %}
+                    <form action="/cancel/{{ res.id }}" method="POST" onsubmit="return confirm('Ești sigur că vrei să anulezi rezervarea?')">
+                        <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium hover:underline">
+                            <i class="fas fa-times mr-1"></i>Anulează
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-white rounded-2xl border p-14 text-center">
+            <i class="fas fa-car text-gray-200 text-7xl mb-5"></i>
+            <h3 class="text-xl font-semibold text-gray-400 mb-2">Nu ai încă nicio rezervare</h3>
+            <p class="text-gray-400 text-sm mb-5">Caută o parcare și rezervă un loc în câteva secunde.</p>
+            <a href="/search" class="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-xl hover:bg-blue-700 transition font-semibold text-sm">
+                Găsește o parcare →
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

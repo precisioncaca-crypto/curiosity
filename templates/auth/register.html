@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Înregistrare — ParkSide{% endblock %}
+{% block content %}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full">
+        <div class="text-center mb-8">
+            <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-parking text-white text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-gray-900">Creează cont</h2>
+            <p class="mt-2 text-gray-500 text-sm">Alătură-te comunității ParkSide</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            <form method="POST" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nume Complet</label>
+                    <input type="text" name="name" required placeholder="Ion Popescu"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Adresă Email</label>
+                    <input type="email" name="email" required placeholder="email@exemplu.com"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Parolă</label>
+                    <input type="password" name="password" required placeholder="Minimum 6 caractere"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition text-sm">
+                    <i class="fas fa-user-plus mr-2"></i>Creează Cont Gratuit
+                </button>
+            </form>
+            <p class="text-center text-gray-500 text-sm mt-5">
+                Ai deja cont? <a href="/login" class="text-blue-600 font-semibold hover:underline">Autentifică-te</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

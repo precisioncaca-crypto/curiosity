@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin — ParkSide{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+
+    <aside class="w-64 bg-gray-900 text-white min-h-screen flex flex-col fixed top-0 left-0 z-40">
+        <div class="p-5 border-b border-gray-700/50">
+            <div class="flex items-center gap-2.5">
+                <img src="/static/img/logo.png" alt="EasyPark" style="height:28px;width:auto;filter:brightness(0) invert(1)">
+                <span class="text-xs bg-blue-500/30 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded-full ml-auto">Admin</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1">
+            <p class="text-xs text-gray-500 uppercase tracking-widest font-semibold px-3 pb-2 pt-1">Navigare</p>
+            <a href="/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+                {% if request.path == '/admin' %}bg-blue-600 text-white{% else %}text-gray-400 hover:bg-gray-800 hover:text-white{% endif %}">
+                <i class="fas fa-chart-pie w-4 text-center"></i>Dashboard
+            </a>
+            <a href="/admin/sessions" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+                {% if '/admin/sessions' in request.path %}bg-blue-600 text-white{% else %}text-gray-400 hover:bg-gray-800 hover:text-white{% endif %}">
+                <i class="fas fa-qrcode w-4 text-center"></i>Sesiuni QR
+                <span class="ml-auto bg-yellow-400 text-yellow-900 text-xs font-bold px-1.5 py-0.5 rounded-full" id="sidebar-badge" style="display:none">!</span>
+            </a>
+            <a href="/admin/parkings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+                {% if '/admin/parkings' in request.path %}bg-blue-600 text-white{% else %}text-gray-400 hover:bg-gray-800 hover:text-white{% endif %}">
+                <i class="fas fa-parking w-4 text-center"></i>Parcări
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-700/50">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-9 h-9 bg-blue-500 rounded-xl flex items-center justify-center text-sm font-bold text-white">
+                    {{ current_user.name[0]|upper }}
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-white leading-none">{{ current_user.name }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Administrator</p>
+                </div>
+            </div>
+            <a href="/" class="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition mb-1.5">
+                <i class="fas fa-home"></i>Înapoi la site
+            </a>
+            <a href="/logout" class="flex items-center gap-2 text-xs text-red-400 hover:text-red-300 transition">
+                <i class="fas fa-sign-out-alt"></i>Deconectare
+            </a>
+        </div>
+    </aside>
+
+    <div class="ml-64 flex-1 flex flex-col min-h-screen">
+        <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-30">
+            <h1 class="text-lg font-bold text-gray-800">{% block page_title %}Dashboard{% endblock %}</h1>
+            <span class="text-sm text-gray-400">{{ now.strftime('%d %B %Y, %H:%M') }}</span>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="px-6 pt-4 space-y-2">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-xl text-sm font-medium {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-green-50 text-green-700 border border-green-200{% endif %}">
+                            <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-2"></i>{{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <main class="flex-1 p-6">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+</body>
+</html>
