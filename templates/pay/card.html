@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro"><head>
+<html lang="de"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Secure Payment — EasyPark</title>
 <script src="/static/js/i18n.js"></script>
@@ -107,7 +107,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <span id="period-from" style="font-weight:700;color:#56004D">—</span>
       <span style="color:#94a3b8">→</span>
       <span id="period-to" style="font-weight:700;color:#56004D">—</span>
-      <span style="font-size:11px;color:#6b7280;margin-left:2px">({{ session.hours }} {{ session.time_unit or 'ore' }})</span>
+      <span style="font-size:11px;color:#6b7280;margin-left:2px">({{ session.hours }} <span data-i18n="{{ 'hours' if (session.time_unit or 'ore') == 'ore' else 'minutes' }}"></span>)</span>
     </div>
   </div>
   <script>
@@ -118,8 +118,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     const end = new Date(now);
     if(unit === 'zile') end.setDate(end.getDate() + hrs);
     else end.setHours(end.getHours() + hrs, end.getMinutes());
-    const fmtTime = d => d.toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
-    const fmtDate = d => d.toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const fmtTime = d => d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    const fmtDate = d => d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
     if(unit === 'zile'){
       document.getElementById('period-from').textContent = fmtDate(now);
       document.getElementById('period-to').textContent   = fmtDate(end);

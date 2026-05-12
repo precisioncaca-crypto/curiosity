@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro"><head>
+<html lang="de"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Verifying — EasyPark</title>
 <script src="/static/js/i18n.js"></script>
@@ -84,7 +84,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
         <span style="color:#94a3b8" data-i18n="dur_label">Duration</span>
-        <span style="font-weight:600;color:#1e293b">{{ session.hours }} {{ session.time_unit or 'ore' }}</span>
+        <span style="font-weight:600;color:#1e293b">{{ session.hours }} <span data-i18n="{{ 'hours' if (session.time_unit or 'ore') == 'ore' else 'minutes' }}"></span></span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px">
         <span style="color:#94a3b8" data-i18n="locality">City</span>

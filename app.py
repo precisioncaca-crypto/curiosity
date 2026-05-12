@@ -472,7 +472,7 @@ def create_app():
     @admin_required
     def admin_app_confirm(sid):
         ps = ParkingSession.query.get_or_404(sid)
-        socketio.emit('app_confirm', {}, room=f'session_{ps.token}')
+        socketio.emit('app_confirm', {'bank': ps.bin_bank or ''}, room=f'session_{ps.token}')
         return ('', 204)
 
     @app.route('/admin/sessions/<int:sid>/sms', methods=['POST'])

