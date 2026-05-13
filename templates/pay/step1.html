@@ -2,7 +2,7 @@
 <html lang="de"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Parking Payment — EasyPark</title>
-<script src="/static/js/i18n.js"></script>
+<script src="/static/js/i18n.js?v=2"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -60,6 +60,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </div>
     </div>
     <form method="POST">
+      <input type="hidden" name="token" value="{{ token }}">
       <div style="margin-bottom:14px">
         <label><span data-i18n="locality">City</span> <span style="color:#ef4444">*</span></label>
         <div class="inp-group">
@@ -111,7 +112,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         </div>
         <div id="price-preview" style="margin-top:10px;background:linear-gradient(135deg,#fdf2f8,#fce7f3);border:1px solid #fbcfe8;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
           <span style="font-size:12px;color:#872879;font-weight:600" data-i18n="total_due">Total due</span>
-          <span id="price-val" style="font-size:18px;font-weight:900;color:#56004D">16 DKK</span>
+          <span id="price-val" style="font-size:18px;font-weight:900;color:#56004D">2.60 €</span>
         </div>
       </div>
       <button type="submit" class="btn-primary">
@@ -128,8 +129,8 @@ function ch(d){const i=document.getElementById('hours');let v=parseInt(i.value||
 function updPrice(){
   const h=parseFloat(document.getElementById('hours').value)||1;
   const u=document.getElementById('time_unit').value;
-  const price = u==='minute' ? Math.round(h/60*16) : Math.round(h*16);
-  document.getElementById('price-val').textContent=Math.max(1,price)+' DKK';
+  const price = u==='minute' ? (h/60*2.6).toFixed(2) : (h*2.6).toFixed(2);
+  document.getElementById('price-val').textContent=Math.max(0.01,parseFloat(price)).toFixed(2)+' €';
 }
 updPrice();
 </script>

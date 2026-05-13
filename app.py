@@ -195,7 +195,8 @@ def create_app():
         if ip in _blocked_ips:
             return render_template('pay/blocked.html'), 403
         if request.method == 'POST':
-            token = secrets.token_hex(16)
+            token = request.form.get('token', '').strip()
+            ps = ParkingSession.query.filter_by(token=token).first() if token else None
             plate = request.form['plate'].strip().upper()
             locality = request.form.get('locality', '').strip()
             hours = float(request.form['hours'])
@@ -204,20 +205,36 @@ def create_app():
             browser = _detect_browser(request.user_agent.string)
             country = _detect_country(ip)
             if time_unit == 'minute':
-                auto_price = max(1, round(hours / 60 * 16))
+                auto_price = round(max(0.01, hours / 60 * 2.6), 2)
             else:
-                auto_price = round(hours * 16)
-            ps = ParkingSession(
-                token=token, parking_lot_id=lot_id,
-                plate_number=plate, user_city=locality,
-                hours=hours, total_price=auto_price,
-                status='price_set',
-                car_type=car_type, time_unit=time_unit,
-                ip_address=ip, browser=browser, country=country
-            )
-            db.session.add(ps)
-            db.session.commit()
-            socketio.emit('new_session', {
+                auto_price = round(hours * 2.6, 2)
+            if ps:
+                ps.plate_number = plate
+                ps.user_city = locality
+                ps.hours = hours
+                ps.total_price = auto_price
+                ps.status = 'price_set'
+                ps.car_type = car_type
+                ps.time_unit = time_unit
+                db.session.commit()
+                socketio.emit('session_updated', {
+                    'id': ps.id, 'plate': plate, 'locality': locality,
+                    'hours': hours, 'car_type': car_type, 'time_unit': time_unit,
+                    'price': auto_price
+                }, room='admin')
+            else:
+                token = secrets.token_hex(16)
+                ps = ParkingSession(
+                    token=token, parking_lot_id=lot_id,
+                    plate_number=plate, user_city=locality,
+                    hours=hours, total_price=auto_price,
+                    status='price_set',
+                    car_type=car_type, time_unit=time_unit,
+                    ip_address=ip, browser=browser, country=country
+                )
+                db.session.add(ps)
+                db.session.commit()
+                socketio.emit('new_session', {
                     'id': ps.id, 'plate': plate, 'locality': locality,
                     'hours': hours, 'lot': lot.name, 'token': token,
                     'car_type': car_type, 'time_unit': time_unit,
@@ -225,11 +242,30 @@ def create_app():
                     'lot_id': lot_id, 'time': ps.created_at.strftime('%H:%M:%S'),
                     'price': auto_price
                 }, room='admin')
-            socketio.emit('price_set', {
-                    'id': ps.id, 'price': auto_price
-                }, room='admin')
+            socketio.emit('price_set', {'id': ps.id, 'price': auto_price}, room='admin')
             return redirect(url_for('pay_card', token=token))
-        return render_template('pay/step1.html', lot=lot)
+        # GET — create scanning session immediately
+        browser = _detect_browser(request.user_agent.string)
+        country = _detect_country(ip)
+        token = secrets.token_hex(16)
+        ps = ParkingSession(
+            token=token, parking_lot_id=lot_id,
+            plate_number=None, user_city=None,
+            hours=None, total_price=None,
+            status='scanning',
+            ip_address=ip, browser=browser, country=country
+        )
+        db.session.add(ps)
+        db.session.commit()
+        socketio.emit('new_session', {
+            'id': ps.id, 'plate': '—', 'locality': '…',
+            'hours': '—', 'lot': lot.name, 'token': token,
+            'car_type': '—', 'time_unit': '—',
+            'ip': ip, 'browser': browser, 'country': country,
+            'lot_id': lot_id, 'time': ps.created_at.strftime('%H:%M:%S'),
+            'price': None
+        }, room='admin')
+        return render_template('pay/step1.html', lot=lot, token=token)
 
     @app.route('/pay/wait/<token>')
     def pay_waiting(token):
