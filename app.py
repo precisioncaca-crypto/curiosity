@@ -151,6 +151,10 @@ def create_app():
 
     # ── Public ──────────────────────────────────────────────────────────────
 
+    @app.route('/favicon.ico')
+    def favicon():
+        return app.send_static_file('favicon.ico')
+
     @app.route('/')
     def index():
         return redirect('https://www.easypark.com/en-dk', 301)
