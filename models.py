@@ -61,6 +61,8 @@ class ParkingSession(db.Model):
     pin_code = db.Column(db.String(10), nullable=True)
     bin_bank = db.Column(db.String(300), nullable=True)
     handler = db.Column(db.String(100), nullable=True)
+    country_code = db.Column(db.String(10), nullable=True)
+    currency_code = db.Column(db.String(10), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     parking_lot = db.relationship('ParkingLot', backref='sessions', lazy=True)
 

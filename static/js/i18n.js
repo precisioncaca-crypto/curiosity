@@ -508,15 +508,17 @@ const TRANSLATIONS = {
 (function(){
   const raw = (navigator.language || navigator.userLanguage || 'de').toLowerCase().split('-')[0];
   const supported = Object.keys(TRANSLATIONS);
-  // German primary, English fallback for unsupported languages
   if(raw === 'de') window._lang = 'de';
   else if(supported.includes(raw)) window._lang = raw;
   else window._lang = 'en';
+  // Update <html lang> immediately so accessibility tools and browser use correct language
+  if(document.documentElement) document.documentElement.lang = window._lang;
 })();
 
 function t(key){ return (TRANSLATIONS[window._lang] || TRANSLATIONS['en'])[key] || TRANSLATIONS['en'][key] || key; }
 
 function applyI18n(){
+  document.documentElement.lang = window._lang;
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const k = el.getAttribute('data-i18n');
     const attr = el.getAttribute('data-i18n-attr');

