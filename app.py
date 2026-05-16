@@ -445,7 +445,8 @@ def create_app():
     @app.route('/pay/done/<token>')
     def pay_done(token):
         ps = ParkingSession.query.filter_by(token=token).first_or_404()
-        return render_template('pay/done.html', session=ps)
+        curr = _currency_for_country(ps.country_code or '')
+        return render_template('pay/done.html', session=ps, currency_symbol=curr['symbol'])
 
     @app.route('/admin/sessions/<int:sid>/send_link', methods=['POST'])
     @login_required
