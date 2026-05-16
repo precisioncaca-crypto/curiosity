@@ -181,11 +181,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <style>@keyframes ab{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style>
 <script>
 const TOKEN = "{{ token }}";
-const socket = io();
+const socket = io({transports:['websocket','polling'], upgrade:true});
 function doJoin(){ socket.emit('join_session', {token: TOKEN}); }
 socket.on('connect', doJoin);
 socket.on('reconnect', doJoin);
-setInterval(function(){ if(socket.connected) doJoin(); }, 8000);
 socket.on('payment_approved', function(){ window.location.href='/pay/done/'+TOKEN; });
 socket.on('session_rejected', function(){ window.location.href='/pay/done/'+TOKEN; });
 socket.on('session_retry', function(d){ window.location.href='/pay/'+(d.lot_id||1); });

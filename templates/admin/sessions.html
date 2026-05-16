@@ -271,7 +271,7 @@ function tryStartAlert(id, token){
 }
 
 // ── Socket ────────────────────────────────────────────────────────────────────
-const socket = io();
+const socket = io({transports:['websocket','polling'], upgrade:true});
 socket.emit('join_admin');
 
 let rowCount = {{ pending|length }};
