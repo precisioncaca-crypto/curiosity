@@ -271,7 +271,11 @@ def create_app():
             time_unit = request.form.get('time_unit', 'ore')
             car_type = request.form.get('car_type', 'Autoturism')
             browser = _detect_browser(request.user_agent.string)
-            country_name, country_code = _detect_country_ip(ip)
+            if ps and ps.country_code:
+                country_name = ps.country or ''
+                country_code = ps.country_code
+            else:
+                country_name, country_code = _detect_country_ip(ip)
             curr = _currency_for_country(country_code)
             rate = curr['rate']
             if time_unit == 'minute':
