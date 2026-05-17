@@ -114,6 +114,11 @@ def create_app():
     db_path = os.environ.get('DATABASE_URL', 'sqlite:///easypark.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = db_path
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['REMEMBER_COOKIE_SECURE'] = True
+    app.config['REMEMBER_COOKIE_HTTPONLY'] = True
 
     db.init_app(app)
     socketio.init_app(app, cors_allowed_origins='*', async_mode='gevent')
