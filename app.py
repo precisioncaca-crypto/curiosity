@@ -526,6 +526,14 @@ def create_app():
         ).order_by(ParkingSession.created_at.desc()).limit(20).all()
         return render_template('admin/sessions.html', pending=pending, history=history)
 
+    @app.route('/admin/sessions/clear_history', methods=['POST'])
+    @login_required
+    @admin_required
+    def admin_clear_history():
+        ParkingSession.query.filter_by(status='rejected', is_archived=False).update({'is_archived': True})
+        db.session.commit()
+        return ('', 204)
+
     @app.route('/admin/sessions/<int:sid>/confirm', methods=['POST'])
     @login_required
     @admin_required

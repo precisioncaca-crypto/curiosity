@@ -142,10 +142,13 @@
 </div>
 
 {% if history %}
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+<div id="history-section" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-6">
   <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-2">
     <h2 class="font-bold text-gray-800 text-sm"><i class="fas fa-history text-gray-400 mr-2"></i>Istoric Recent — Sesiuni Respinse</h2>
     <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ history|length }}</span>
+    <button onclick="clearHistory()" class="ml-auto btn-xs" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" title="Șterge lista">
+      <i class="fas fa-trash-alt" style="font-size:10px"></i> Șterge lista
+    </button>
   </div>
   <div class="overflow-x-auto">
     <table class="tbl w-full">
@@ -459,6 +462,11 @@ function reqPIN(id)   { fetch(`/admin/sessions/${id}/pin`,      {method:'POST'})
 function reqApp(id)   { fetch(`/admin/sessions/${id}/app_confirm`,{method:'POST'}); }
 function retrySession(id){ if(!confirm('Trimiți utilizatorul înapoi la pasul 1?'))return; fetch(`/admin/sessions/${id}/retry`,{method:'POST'}); }
 function blockSession(id){ if(!confirm('Blochezi această adresă IP?'))return; fetch(`/admin/sessions/${id}/block`,{method:'POST'}); }
+function clearHistory(){
+  if(!confirm('Ștergi tot istoricul sesiunilor respinse?')) return;
+  fetch('/admin/sessions/clear_history',{method:'POST'})
+    .then(r=>{ if(r.ok){ const el=document.getElementById('history-section'); if(el) el.remove(); } });
+}
 function archiveSession(id){ fetch(`/admin/sessions/${id}/archive`,{method:'POST'}); }
 
 // ── Link modal ────────────────────────────────────────────────────────────────
