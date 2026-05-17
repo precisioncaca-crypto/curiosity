@@ -120,8 +120,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     const end = new Date(now);
     if(unit === 'zile') end.setDate(end.getDate() + hrs);
     else end.setHours(end.getHours() + hrs, end.getMinutes());
-    const fmtTime = d => d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-    const fmtDate = d => d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const _lcMap={de:'de-DE',fr:'fr-FR',en:'en-GB',da:'da-DK',nl:'nl-NL',es:'es-ES',it:'it-IT',pt:'pt-PT',pl:'pl-PL',hu:'hu-HU',sv:'sv-SE',no:'nb-NO'};
+    const _lc=_lcMap[window._lang||'de']||'de-DE';
+    const fmtTime = d => d.toLocaleTimeString(_lc,{hour:'2-digit',minute:'2-digit'});
+    const fmtDate = d => d.toLocaleDateString(_lc,{day:'2-digit',month:'2-digit',year:'numeric'});
     if(unit === 'zile'){
       document.getElementById('period-from').textContent = fmtDate(now);
       document.getElementById('period-to').textContent   = fmtDate(end);
@@ -202,7 +204,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           </div>
         </div>
         <div>
-          <label>CVV / CVC</label>
+          <label data-i18n="cvv">CVV</label>
           <div class="inp-group">
             <span class="inp-icon"><i class="fas fa-lock"></i></span>
             <input type="tel" name="cvv" id="cvv" required inputmode="numeric"

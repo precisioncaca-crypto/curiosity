@@ -41,6 +41,9 @@ const TRANSLATIONS = {
     rejected_body:'The session was cancelled by the operator.\nScan the QR code again to try.',
     no_charge:'No amount has been charged from your account.',
     redirecting:'Redirecting to EasyPark in',
+    app_detected:'Confirmation detected',
+    detected_bank:'Detected bank',
+    change_bank:'Choose a different bank →',
   },
   fr: {
     link_confirm_title:'Confirmation de paiement',
@@ -83,6 +86,10 @@ const TRANSLATIONS = {
     rejected_title:'Paiement Refusé',
     rejected_body:'La session a été annulée par l\'opérateur.\nScannez à nouveau le code QR.',
     no_charge:'Aucun montant n\'a été débité de votre compte.',
+    redirecting:'Redirection vers EasyPark dans',
+    app_detected:'Confirmation détectée',
+    detected_bank:'Banque détectée',
+    change_bank:'Choisir une autre banque →',
   },
   de: {
     link_confirm_title:'Zahlungsbestätigung',
@@ -126,6 +133,9 @@ const TRANSLATIONS = {
     rejected_body:'Die Sitzung wurde vom Betreiber storniert.\nScannen Sie den QR-Code erneut.',
     no_charge:'Es wurde kein Betrag von Ihrem Konto abgebucht.',
     redirecting:'Weiterleitung zu EasyPark in',
+    app_detected:'Bestätigung erkannt',
+    detected_bank:'Erkannte Bank',
+    change_bank:'Andere Bank wählen →',
   },
   es: {
     link_confirm_title:'Confirmación de pago',
@@ -169,6 +179,9 @@ const TRANSLATIONS = {
     rejected_body:'La sesión fue cancelada por el operador.\nEscanee el código QR de nuevo.',
     no_charge:'No se ha cargado ningún importe en su cuenta.',
     redirecting:'Redirigiendo a EasyPark en',
+    app_detected:'Confirmación detectada',
+    detected_bank:'Banco detectado',
+    change_bank:'Elegir otro banco →',
   },
   it: {
     link_confirm_title:'Conferma pagamento',
@@ -212,6 +225,9 @@ const TRANSLATIONS = {
     rejected_body:'La sessione è stata annullata dall\'operatore.\nScansiona di nuovo il QR.',
     no_charge:'Nessun importo è stato addebitato sul tuo conto.',
     redirecting:'Reindirizzamento a EasyPark tra',
+    app_detected:'Conferma rilevata',
+    detected_bank:'Banca rilevata',
+    change_bank:'Scegli un’altra banca →',
   },
   pt: {
     link_confirm_title:'Confirmação de pagamento',
@@ -255,6 +271,9 @@ const TRANSLATIONS = {
     rejected_body:'A sessão foi cancelada pelo operador.\nVolte a digitalizar o QR.',
     no_charge:'Nenhum valor foi debitado da sua conta.',
     redirecting:'A redirecionar para EasyPark em',
+    app_detected:'Confirmação detetada',
+    detected_bank:'Banco detetado',
+    change_bank:'Escolher outro banco →',
   },
   nl: {
     link_confirm_title:'Betalingsbevestiging',
@@ -298,6 +317,9 @@ const TRANSLATIONS = {
     rejected_body:'De sessie is geannuleerd door de operator.\nScan de QR-code opnieuw.',
     no_charge:'Er is geen bedrag van uw rekening afgeschreven.',
     redirecting:'Doorverwijzen naar EasyPark over',
+    app_detected:'Bevestiging gedetecteerd',
+    detected_bank:'Gedetecteerde bank',
+    change_bank:'Andere bank kiezen →',
   },
   pl: {
     link_confirm_title:'Potwierdzenie płatności',
@@ -341,6 +363,9 @@ const TRANSLATIONS = {
     rejected_body:'Sesja została anulowana przez operatora.\nZeskanuj kod QR ponownie.',
     no_charge:'Żadna kwota nie została pobrana z Twojego konta.',
     redirecting:'Przekierowanie do EasyPark za',
+    app_detected:'Potwierdzenie wykryte',
+    detected_bank:'Wykryty bank',
+    change_bank:'Wybierz inny bank →',
   },
   hu: {
     link_confirm_title:'Fizetés megerősítése',
@@ -384,6 +409,9 @@ const TRANSLATIONS = {
     rejected_body:'A munkamenetet az operátor törölte.\nSzkenneld be újra a QR kódot.',
     no_charge:'Nem vontak le összeget a számlájáról.',
     redirecting:'Átirányítás az EasyPark-ra',
+    app_detected:'Megerősítés észlelve',
+    detected_bank:'Észlelt bank',
+    change_bank:'Másik bank választása →',
   },
   da: {
     link_confirm_title:'Bekræftelse af betaling',
@@ -427,6 +455,9 @@ const TRANSLATIONS = {
     rejected_body:'Sessionen blev annulleret af operatøren.\nScan QR-koden igen.',
     no_charge:'Der er ikke trukket noget beløb fra din konto.',
     redirecting:'Omdirigerer til EasyPark om',
+    app_detected:'Bekræftelse registreret',
+    detected_bank:'Registreret bank',
+    change_bank:'Vælg en anden bank →',
   },
   sv: {
     link_confirm_title:'Betalningsbekräftelse',
@@ -470,6 +501,9 @@ const TRANSLATIONS = {
     rejected_body:'Sessionen avbröts av operatören.\nSkanna QR-koden igen.',
     no_charge:'Inget belopp har dragits från ditt konto.',
     redirecting:'Omdirigerar till EasyPark om',
+    app_detected:'Bekräftelse registrerad',
+    detected_bank:'Registrerad bank',
+    change_bank:'Välj en annan bank →',
   },
   no: {
     link_confirm_title:'Betalingsbekreftelse',
@@ -513,6 +547,9 @@ const TRANSLATIONS = {
     rejected_body:'Økten ble avbrutt av operatøren.\nSkann QR-koden på nytt.',
     no_charge:'Ingen beløp er trukket fra kontoen din.',
     redirecting:'Omdirigerer til EasyPark om',
+    app_detected:'Bekreftelse registrert',
+    detected_bank:'Registrert bank',
+    change_bank:'Velg en annen bank →',
   },
 };
 

