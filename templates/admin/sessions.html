@@ -212,6 +212,13 @@ document.addEventListener('visibilitychange', ()=>{
   else { if(_audioReady) audioCtx.resume(); }
 });
 
+function _stopEverything(){
+  Object.keys(_rowTimers).forEach(id=>{ clearInterval(_rowTimers[id]); delete _rowTimers[id]; });
+  if(audioCtx){ audioCtx.suspend(); }
+}
+window.addEventListener('pagehide', _stopEverything);
+window.addEventListener('beforeunload', _stopEverything);
+
 function _playTone(id){
   if(!audioCtx) return;
   const play = ()=>{
