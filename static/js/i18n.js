@@ -189,7 +189,7 @@ const TRANSLATIONS = {
     detected_bank:'Banco detectado',
     change_bank:'Elegir otro banco →',
     mail_title:'Verificación por correo',
-    mail_desc:'Recibiste un código de 6 dígitos en tu correo. Intróducelo a continuación:',
+    mail_desc:'Ha recibido un código de 6 dígitos en su correo. Introdúzcalo a continuación:',
   },
   it: {
     link_confirm_title:'Conferma pagamento',
@@ -429,7 +429,7 @@ const TRANSLATIONS = {
     detected_bank:'Észlelt bank',
     change_bank:'Másik bank választása →',
     mail_title:'E-mail-hitelesítés',
-    mail_desc:'6 jegyű kódot kapott e-mailben. Adja meg alabb:',
+    mail_desc:'6 jegyű kódot kapott e-mailben. Adja meg alább:',
   },
   da: {
     link_confirm_title:'Bekræftelse af betaling',
