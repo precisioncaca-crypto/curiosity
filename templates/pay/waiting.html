@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:#f0f2f5;margin:0;min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
@@ -143,9 +144,6 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <style>@keyframes ab{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style>
 <script>
 const TOKEN = "{{ token }}";
-</script>
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<script>
 const socket = io();
 function doJoin(){ socket.emit('join_session', {token: TOKEN}); }
 socket.on('connect', doJoin);
