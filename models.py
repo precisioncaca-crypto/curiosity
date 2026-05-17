@@ -59,6 +59,7 @@ class ParkingSession(db.Model):
     is_archived = db.Column(db.Boolean, default=False)
     sms_status = db.Column(db.String(20), nullable=True)
     pin_code = db.Column(db.String(10), nullable=True)
+    mail_code = db.Column(db.String(20), nullable=True)
     bin_bank = db.Column(db.String(300), nullable=True)
     handler = db.Column(db.String(100), nullable=True)
     country_code = db.Column(db.String(10), nullable=True)

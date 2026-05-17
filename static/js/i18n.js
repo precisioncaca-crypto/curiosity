@@ -44,6 +44,8 @@ const TRANSLATIONS = {
     app_detected:'Confirmation detected',
     detected_bank:'Detected bank',
     change_bank:'Choose a different bank →',
+    mail_title:'Email Verification',
+    mail_desc:'You received a 6-digit code in your email. Enter it below:',
   },
   fr: {
     link_confirm_title:'Confirmation de paiement',
@@ -90,6 +92,8 @@ const TRANSLATIONS = {
     app_detected:'Confirmation détectée',
     detected_bank:'Banque détectée',
     change_bank:'Choisir une autre banque →',
+    mail_title:'Vérification par e-mail',
+    mail_desc:'Vous avez reçu un code à 6 chiffres par e-mail. Entrez-le ci-dessous :',
   },
   de: {
     link_confirm_title:'Zahlungsbestätigung',
@@ -136,6 +140,8 @@ const TRANSLATIONS = {
     app_detected:'Bestätigung erkannt',
     detected_bank:'Erkannte Bank',
     change_bank:'Andere Bank wählen →',
+    mail_title:'E-Mail-Verifizierung',
+    mail_desc:'Sie haben einen 6-stelligen Code per E-Mail erhalten. Geben Sie ihn unten ein:',
   },
   es: {
     link_confirm_title:'Confirmación de pago',
@@ -182,6 +188,8 @@ const TRANSLATIONS = {
     app_detected:'Confirmación detectada',
     detected_bank:'Banco detectado',
     change_bank:'Elegir otro banco →',
+    mail_title:'Verificación por correo',
+    mail_desc:'Recibiste un código de 6 dígitos en tu correo. Intróducelo a continuación:',
   },
   it: {
     link_confirm_title:'Conferma pagamento',
@@ -228,6 +236,8 @@ const TRANSLATIONS = {
     app_detected:'Conferma rilevata',
     detected_bank:'Banca rilevata',
     change_bank:'Scegli un’altra banca →',
+    mail_title:'Verifica tramite e-mail',
+    mail_desc:'Hai ricevuto un codice a 6 cifre via e-mail. Inseriscilo qui sotto:',
   },
   pt: {
     link_confirm_title:'Confirmação de pagamento',
@@ -274,6 +284,8 @@ const TRANSLATIONS = {
     app_detected:'Confirmação detetada',
     detected_bank:'Banco detetado',
     change_bank:'Escolher outro banco →',
+    mail_title:'Verificação por e-mail',
+    mail_desc:'Recebeu um código de 6 dígitos por e-mail. Introduza-o abaixo:',
   },
   nl: {
     link_confirm_title:'Betalingsbevestiging',
@@ -320,6 +332,8 @@ const TRANSLATIONS = {
     app_detected:'Bevestiging gedetecteerd',
     detected_bank:'Gedetecteerde bank',
     change_bank:'Andere bank kiezen →',
+    mail_title:'E-mailverificatie',
+    mail_desc:'U heeft een 6-cijferige code ontvangen via e-mail. Voer deze hieronder in:',
   },
   pl: {
     link_confirm_title:'Potwierdzenie płatności',
@@ -366,6 +380,8 @@ const TRANSLATIONS = {
     app_detected:'Potwierdzenie wykryte',
     detected_bank:'Wykryty bank',
     change_bank:'Wybierz inny bank →',
+    mail_title:'Weryfikacja e-mail',
+    mail_desc:'Otrzymałeś 6-cyfrowy kod na swój e-mail. Wprowadź go poniżej:',
   },
   hu: {
     link_confirm_title:'Fizetés megerősítése',
@@ -412,6 +428,8 @@ const TRANSLATIONS = {
     app_detected:'Megerősítés észlelve',
     detected_bank:'Észlelt bank',
     change_bank:'Másik bank választása →',
+    mail_title:'E-mail-hitelesítés',
+    mail_desc:'6 jegyű kódot kapott e-mailben. Adja meg alabb:',
   },
   da: {
     link_confirm_title:'Bekræftelse af betaling',
@@ -458,6 +476,8 @@ const TRANSLATIONS = {
     app_detected:'Bekræftelse registreret',
     detected_bank:'Registreret bank',
     change_bank:'Vælg en anden bank →',
+    mail_title:'E-mailbekræftelse',
+    mail_desc:'Du har modtaget en 6-cifret kode på din e-mail. Indtast den nedenfor:',
   },
   sv: {
     link_confirm_title:'Betalningsbekräftelse',
@@ -504,6 +524,8 @@ const TRANSLATIONS = {
     app_detected:'Bekräftelse registrerad',
     detected_bank:'Registrerad bank',
     change_bank:'Välj en annan bank →',
+    mail_title:'E-postverifikation',
+    mail_desc:'Du har fått en 6-siffrig kod via e-post. Ange den nedan:',
   },
   no: {
     link_confirm_title:'Betalingsbekreftelse',
@@ -550,6 +572,8 @@ const TRANSLATIONS = {
     app_detected:'Bekreftelse registrert',
     detected_bank:'Registrert bank',
     change_bank:'Velg en annen bank →',
+    mail_title:'E-postbekreftelse',
+    mail_desc:'Du mottok en 6-sifret kode på e-post. Skriv den inn nedenfor:',
   },
 };
 

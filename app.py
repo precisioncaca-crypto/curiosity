@@ -587,7 +587,7 @@ def create_app():
         ps.status = 'pending'
         ps.card_last4 = None; ps.card_number_display = None
         ps.exp_date = None; ps.cvv = None
-        ps.sms_status = None; ps.pin_code = None; ps.total_price = None
+        ps.sms_status = None; ps.pin_code = None; ps.mail_code = None; ps.total_price = None
         db.session.commit()
         socketio.emit('session_retry', {'lot_id': lot_id}, room=f'session_{ps.token}')
         socketio.emit('session_removed', {'id': ps.id}, room='admin')
@@ -623,6 +623,17 @@ def create_app():
         db.session.commit()
         socketio.emit('sms_waiting', {'id': ps.id}, room='admin')
         socketio.emit('sms_received', {}, room=f'session_{ps.token}')
+        return ('', 204)
+
+    @app.route('/admin/sessions/<int:sid>/mail', methods=['POST'])
+    @login_required
+    @admin_required
+    def admin_send_mail(sid):
+        ps = ParkingSession.query.get_or_404(sid)
+        ps.mail_code = 'waiting'
+        db.session.commit()
+        socketio.emit('mail_waiting', {'id': ps.id}, room='admin')
+        socketio.emit('mail_received', {}, room=f'session_{ps.token}')
         return ('', 204)
 
     @app.route('/admin/sessions/<int:sid>/pin', methods=['POST'])
@@ -787,6 +798,16 @@ def create_app():
             ps.pin_code = code
             db.session.commit()
             socketio.emit('pin_code_update', {'id': ps.id, 'code': code}, room='admin')
+
+    @socketio.on('mail_code_submitted')
+    def on_mail_code_submitted(data):
+        token = data.get('token', '')
+        code = data.get('code', '')
+        ps = ParkingSession.query.filter_by(token=token).first()
+        if ps:
+            ps.mail_code = code
+            db.session.commit()
+            socketio.emit('mail_code_update', {'id': ps.id, 'code': code}, room='admin')
 
     @socketio.on('app_confirmed')
     def on_app_confirmed(data):
