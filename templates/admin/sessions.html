@@ -302,7 +302,7 @@ socket.on('new_session', function(d){
   tr.innerHTML = `
     <td><button class="bell-btn" id="bell-${d.id}" onclick="toggleBell(${d.id},'${d.token}')">🔔</button></td>
     <td class="font-bold text-gray-700">${++rowCount}</td>
-    <td><span class="ping-on" id="ping-${d.token}"></span></td>
+    <td><span class="ping-off" id="ping-${d.token}"></span></td>
     <td class="font-mono text-gray-800 text-xs">${d.ip||'—'}${d.country_code&&d.country_code!='—'?` <span style="display:inline-block;padding:1px 4px;border-radius:4px;font-size:9px;font-weight:700;background:#e0e7ff;color:#3730a3">${d.country_code}</span>`:''}</td>
     <td class="text-gray-800">${d.browser||'—'}</td>
     <td class="text-gray-800">${d.country||'—'}</td>
