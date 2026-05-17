@@ -353,4 +353,13 @@ function fmtExp(el){
 }
 function flip(on){ document.getElementById('cc-inner').classList.toggle('flipped',on); }
 </script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+(function(){
+  var TOKEN='{{ token }}';
+  var s=io({transports:['websocket','polling'],upgrade:true});
+  function j(){ s.emit('join_session',{token:TOKEN}); }
+  s.on('connect',j); s.on('reconnect',j);
+})();
+</script>
 </body></html>
