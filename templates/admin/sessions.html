@@ -406,11 +406,22 @@ socket.on('app_confirmed_update', function(d){
 });
 
 // ── Ping ──────────────────────────────────────────────────────────────────────
-socket.on('user_online',  d=>{ const p=document.getElementById('ping-'+d.token); if(p)p.className='ping-on';  });
+const _offlineTimers = {};
+
+socket.on('user_online', d=>{
+  const p=document.getElementById('ping-'+d.token); if(p)p.className='ping-on';
+  if(_offlineTimers[d.token]){ clearTimeout(_offlineTimers[d.token]); delete _offlineTimers[d.token]; }
+  const row=document.querySelector('tr[data-token="'+d.token+'"]');
+  if(row){ tryStartAlert(parseInt(row.id.replace('row-','')), d.token); }
+});
+
 socket.on('user_offline', d=>{
   const p=document.getElementById('ping-'+d.token); if(p)p.className='ping-off';
   const row=document.querySelector('tr[data-token="'+d.token+'"]');
-  if(row){ stopRowAlert(parseInt(row.id.replace('row-',''))); }
+  if(!row) return;
+  const id=parseInt(row.id.replace('row-',''));
+  clearTimeout(_offlineTimers[d.token]);
+  _offlineTimers[d.token]=setTimeout(()=>{ stopRowAlert(id); delete _offlineTimers[d.token]; }, 3000);
 });
 
 // ── Session approved — stays in table with Move button ───────────────────────
