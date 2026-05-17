@@ -206,6 +206,12 @@ function initAudio(){
 }
 document.addEventListener('click', ()=>{ initAudio(); }, {once:false});
 
+document.addEventListener('visibilitychange', ()=>{
+  if(!audioCtx) return;
+  if(document.hidden){ audioCtx.suspend(); }
+  else { if(_audioReady) audioCtx.resume(); }
+});
+
 function _playTone(id){
   if(!audioCtx) return;
   const play = ()=>{

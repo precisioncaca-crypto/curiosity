@@ -3,6 +3,8 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Processing Payment — EasyPark</title>
 <script src="/static/js/i18n.js?v=3"></script>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style>
@@ -85,11 +87,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <span style="font-weight:700;color:#1e293b;letter-spacing:.08em">{{ session.plate_number }}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
-        <span style="color:#94a3b8">Card</span>
+        <span style="color:#94a3b8" data-i18n="card_label">Card</span>
         <span style="font-weight:600;color:#1e293b;font-family:'Courier New',monospace">•••• {{ session.card_last4 or '——' }}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px">
-        <span style="color:#94a3b8">Total</span>
+        <span style="color:#94a3b8" data-i18n="total_label">Total</span>
         <span style="font-weight:800;color:#56004D;font-size:15px">{{ session.total_price }} {{ currency_symbol }}</span>
 
       </div>

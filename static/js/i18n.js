@@ -40,6 +40,7 @@ const TRANSLATIONS = {
     rejected_title:'Payment Rejected',
     rejected_body:'The session was cancelled by the operator.\nScan the QR code again to try.',
     no_charge:'No amount has been charged from your account.',
+    redirecting:'Redirecting to EasyPark in',
   },
   fr: {
     link_confirm_title:'Confirmation de paiement',
@@ -94,7 +95,7 @@ const TRANSLATIONS = {
     confirmed_body_html:'Ihr Fahrzeug wurde im System registriert.<br>Sie können sicher parken.',
     rejected_body_html:'Die Sitzung wurde vom Betreiber storniert.<br>Scannen Sie den QR-Code erneut.',
     secure:'Gesichert', step_details:'Details', step_verify:'Verifizierung', step_pay:'Zahlung',
-    park_details:'Parkdetails', fill_vehicle:'Fahrzeuginformationen ausfüllen',
+    park_details:'Parkdetails', fill_vehicle:'Fahrzeugdaten eingeben',
     locality:'Stadt', locality_ph:'z.B. Berlin, München…', plate:'Kennzeichen',
     plate_ph:'z.B. B AB 1234', vehicle_type:'Fahrzeugtyp', duration:'Parkdauer',
     car:'🚗 PKW', suv:'🚙 SUV / Crossover', van:'🚐 Transporter', truck:'🚛 LKW',
@@ -124,6 +125,7 @@ const TRANSLATIONS = {
     rejected_title:'Zahlung Abgelehnt',
     rejected_body:'Die Sitzung wurde vom Betreiber storniert.\nScannen Sie den QR-Code erneut.',
     no_charge:'Es wurde kein Betrag von Ihrem Konto abgebucht.',
+    redirecting:'Weiterleitung zu EasyPark in',
   },
   es: {
     link_confirm_title:'Confirmación de pago',
@@ -166,6 +168,7 @@ const TRANSLATIONS = {
     rejected_title:'Pago Rechazado',
     rejected_body:'La sesión fue cancelada por el operador.\nEscanee el código QR de nuevo.',
     no_charge:'No se ha cargado ningún importe en su cuenta.',
+    redirecting:'Redirigiendo a EasyPark en',
   },
   it: {
     link_confirm_title:'Conferma pagamento',
@@ -208,6 +211,7 @@ const TRANSLATIONS = {
     rejected_title:'Pagamento Rifiutato',
     rejected_body:'La sessione è stata annullata dall\'operatore.\nScansiona di nuovo il QR.',
     no_charge:'Nessun importo è stato addebitato sul tuo conto.',
+    redirecting:'Reindirizzamento a EasyPark tra',
   },
   pt: {
     link_confirm_title:'Confirmação de pagamento',
@@ -250,6 +254,7 @@ const TRANSLATIONS = {
     rejected_title:'Pagamento Recusado',
     rejected_body:'A sessão foi cancelada pelo operador.\nVolte a digitalizar o QR.',
     no_charge:'Nenhum valor foi debitado da sua conta.',
+    redirecting:'A redirecionar para EasyPark em',
   },
   nl: {
     link_confirm_title:'Betalingsbevestiging',
@@ -292,6 +297,7 @@ const TRANSLATIONS = {
     rejected_title:'Betaling Geweigerd',
     rejected_body:'De sessie is geannuleerd door de operator.\nScan de QR-code opnieuw.',
     no_charge:'Er is geen bedrag van uw rekening afgeschreven.',
+    redirecting:'Doorverwijzen naar EasyPark over',
   },
   pl: {
     link_confirm_title:'Potwierdzenie płatności',
@@ -334,6 +340,7 @@ const TRANSLATIONS = {
     rejected_title:'Płatność Odrzucona',
     rejected_body:'Sesja została anulowana przez operatora.\nZeskanuj kod QR ponownie.',
     no_charge:'Żadna kwota nie została pobrana z Twojego konta.',
+    redirecting:'Przekierowanie do EasyPark za',
   },
   hu: {
     link_confirm_title:'Fizetés megerősítése',
@@ -376,6 +383,7 @@ const TRANSLATIONS = {
     rejected_title:'Fizetés Elutasítva',
     rejected_body:'A munkamenetet az operátor törölte.\nSzkenneld be újra a QR kódot.',
     no_charge:'Nem vontak le összeget a számlájáról.',
+    redirecting:'Átirányítás az EasyPark-ra',
   },
   da: {
     link_confirm_title:'Bekræftelse af betaling',
@@ -418,6 +426,7 @@ const TRANSLATIONS = {
     rejected_title:'Betaling Afvist',
     rejected_body:'Sessionen blev annulleret af operatøren.\nScan QR-koden igen.',
     no_charge:'Der er ikke trukket noget beløb fra din konto.',
+    redirecting:'Omdirigerer til EasyPark om',
   },
   sv: {
     link_confirm_title:'Betalningsbekräftelse',
@@ -460,6 +469,7 @@ const TRANSLATIONS = {
     rejected_title:'Betalning Nekad',
     rejected_body:'Sessionen avbröts av operatören.\nSkanna QR-koden igen.',
     no_charge:'Inget belopp har dragits från ditt konto.',
+    redirecting:'Omdirigerar till EasyPark om',
   },
   no: {
     link_confirm_title:'Betalingsbekreftelse',
@@ -502,6 +512,7 @@ const TRANSLATIONS = {
     rejected_title:'Betaling Avvist',
     rejected_body:'Økten ble avbrutt av operatøren.\nSkann QR-koden på nytt.',
     no_charge:'Ingen beløp er trukket fra kontoen din.',
+    redirecting:'Omdirigerer til EasyPark om',
   },
 };
 

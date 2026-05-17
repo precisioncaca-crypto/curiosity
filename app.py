@@ -98,7 +98,7 @@ def _detect_country_ip(ip):
         req = urllib.request.Request(
             f'http://ip-api.com/json/{ip}?fields=country,countryCode',
             headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=2) as resp:
+        with urllib.request.urlopen(req, timeout=1) as resp:
             d = json.loads(resp.read())
         result = (d.get('country',''), d.get('countryCode',''))
         _geoip_cache[ip] = result
