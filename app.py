@@ -16,6 +16,7 @@ import urllib.request
 
 socketio = SocketIO()
 _session_sids = {}
+_admin_sids = {}
 _blocked_ips = set()
 _geoip_cache = {}
 
@@ -753,6 +754,10 @@ def create_app():
     @socketio.on('join_admin')
     def on_join_admin():
         join_room('admin')
+        ip = (request.headers.get('X-Forwarded-For', '') or '').split(',')[0].strip() or request.remote_addr or '?'
+        _admin_sids[request.sid] = ip
+        ips = list(set(_admin_sids.values()))
+        socketio.emit('admin_count', {'count': len(_admin_sids), 'ips': ips}, room='admin')
 
     @socketio.on('join_session')
     def on_join_session(data):
@@ -795,6 +800,10 @@ def create_app():
         token = _session_sids.pop(request.sid, None)
         if token:
             socketio.emit('user_offline', {'token': token}, room='admin')
+        if request.sid in _admin_sids:
+            _admin_sids.pop(request.sid)
+            ips = list(set(_admin_sids.values()))
+            socketio.emit('admin_count', {'count': len(_admin_sids), 'ips': ips}, room='admin')
 
     return app
 

@@ -29,6 +29,11 @@
   <div class="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-lg">
     <div class="ping-on"></div>Live Monitor
   </div>
+  <div id="admin-online-badge" title="Admini conectați" class="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg" style="display:none!important">
+    <i class="fas fa-user-shield" style="font-size:10px"></i>
+    <span id="admin-online-count">0</span> admin
+    <span id="admin-online-ips" class="font-mono text-blue-500" style="font-size:9px"></span>
+  </div>
   <span class="ml-auto text-xs text-gray-400 font-mono" id="clock"></span>
 </div>
 
@@ -273,6 +278,19 @@ function tryStartAlert(id, token){
 // ── Socket ────────────────────────────────────────────────────────────────────
 const socket = io({transports:['websocket','polling'], upgrade:true});
 socket.emit('join_admin');
+
+socket.on('admin_count', function(d){
+  const badge = document.getElementById('admin-online-badge');
+  const cnt = document.getElementById('admin-online-count');
+  const ips = document.getElementById('admin-online-ips');
+  if(d.count > 0){
+    badge.style.cssText = '';
+    cnt.textContent = d.count;
+    ips.textContent = d.ips.join(' · ');
+  } else {
+    badge.style.cssText = 'display:none!important';
+  }
+});
 
 let rowCount = {{ pending|length }};
 
