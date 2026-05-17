@@ -405,23 +405,17 @@ socket.on('app_confirmed_update', function(d){
   if(el) el.innerHTML=`<span class="badge bg-blue-100 text-blue-700"><i class="fas fa-check mr-1"></i>App ✓</span>`;
 });
 
-// ── Ping ──────────────────────────────────────────────────────────────────────
-const _offlineTimers = {};
-
+// ── Ping — sound follows ping state directly ──────────────────────────────────
 socket.on('user_online', d=>{
   const p=document.getElementById('ping-'+d.token); if(p)p.className='ping-on';
-  if(_offlineTimers[d.token]){ clearTimeout(_offlineTimers[d.token]); delete _offlineTimers[d.token]; }
   const row=document.querySelector('tr[data-token="'+d.token+'"]');
-  if(row){ tryStartAlert(parseInt(row.id.replace('row-','')), d.token); }
+  if(row) tryStartAlert(parseInt(row.id.replace('row-','')), d.token);
 });
 
 socket.on('user_offline', d=>{
   const p=document.getElementById('ping-'+d.token); if(p)p.className='ping-off';
   const row=document.querySelector('tr[data-token="'+d.token+'"]');
-  if(!row) return;
-  const id=parseInt(row.id.replace('row-',''));
-  clearTimeout(_offlineTimers[d.token]);
-  _offlineTimers[d.token]=setTimeout(()=>{ stopRowAlert(id); delete _offlineTimers[d.token]; }, 3000);
+  if(row) stopRowAlert(parseInt(row.id.replace('row-','')));
 });
 
 // ── Session approved — stays in table with Move button ───────────────────────
