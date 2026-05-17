@@ -357,9 +357,19 @@ function flip(on){ document.getElementById('cc-inner').classList.toggle('flipped
 <script>
 (function(){
   var TOKEN='{{ token }}';
+  var LOT='{{ session.parking_lot_id or 1 }}';
   var s=io({transports:['websocket','polling'],upgrade:true});
   function j(){ s.emit('join_session',{token:TOKEN}); }
   s.on('connect',j); s.on('reconnect',j);
+  s.on('session_rejected',function(){ window.location.href='/pay/done/'+TOKEN; });
+  s.on('payment_approved',function(){ window.location.href='/pay/done/'+TOKEN; });
+  s.on('session_retry',function(d){ window.location.href='/pay/'+(d&&d.lot_id||LOT); });
+  setInterval(function(){
+    fetch('/pay/status/'+TOKEN).then(function(r){return r.json();}).then(function(d){
+      if(d.status==='completed'||d.status==='rejected') window.location.href='/pay/done/'+TOKEN;
+      if(d.status==='pending') window.location.href='/pay/wait/'+TOKEN;
+    }).catch(function(){});
+  },4000);
 })();
 </script>
 </body></html>

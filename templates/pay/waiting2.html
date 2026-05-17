@@ -286,7 +286,12 @@ function initOTPMail(){
   boxes.forEach((b,i)=>{
     b.addEventListener('input',()=>{
       const raw=b.value.replace(/\D/g,'');
-      b.value=raw?raw[0]:'';
+      if(raw.length>1){
+        boxes.forEach((x,j)=>{x.value=raw[j]||'';x.classList.toggle('otp-filled',!!x.value);});
+        const last=Math.min(raw.length,6)-1; if(last>=0) boxes[last].focus();
+        checkOTPMail(boxes); return;
+      }
+      b.value=raw.slice(-1);
       b.classList.toggle('otp-filled',!!b.value);
       if(b.value&&i<5) boxes[i+1].focus();
       checkOTPMail(boxes);
