@@ -273,7 +273,9 @@ function tryStartAlert(id, token){
 
 // ── Socket ────────────────────────────────────────────────────────────────────
 const socket = io({transports:['websocket','polling'], upgrade:true});
-socket.emit('join_admin');
+function joinAdmin(){ socket.emit('join_admin'); }
+socket.on('connect', joinAdmin);
+socket.on('reconnect', joinAdmin);
 
 socket.on('admin_count', function(d){
   const badge = document.getElementById('admin-online-badge');

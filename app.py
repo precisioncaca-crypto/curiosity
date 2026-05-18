@@ -149,7 +149,16 @@ def create_app():
     # ── Auto-migrate new columns ────────────────────────────────────────────
     with app.app_context():
         db.create_all()
+        try:
+            with db.engine.connect() as _wc:
+                _wc.execute(db.text('PRAGMA journal_mode=WAL'))
+                _wc.execute(db.text('PRAGMA synchronous=NORMAL'))
+                _wc.execute(db.text('PRAGMA cache_size=-8000'))
+                _wc.commit()
+        except Exception:
+            pass
         for _col, _typ in [('bin_bank','VARCHAR(300)'),('country_code','VARCHAR(10)'),('currency_code','VARCHAR(10)')]:
+
             try:
                 with db.engine.connect() as _conn:
                     _conn.execute(db.text(f'ALTER TABLE parking_session ADD COLUMN {_col} {_typ}'))
@@ -765,6 +774,9 @@ def create_app():
         _admin_sids[request.sid] = ip
         ips = list(set(_admin_sids.values()))
         socketio.emit('admin_count', {'count': len(_admin_sids), 'ips': ips}, room='admin')
+        # Restore ping state for this admin (or reconnecting admin)
+        for token in set(_session_sids.values()):
+            socketio.emit('user_online', {'token': token}, room=request.sid)
 
     @socketio.on('join_session')
     def on_join_session(data):
