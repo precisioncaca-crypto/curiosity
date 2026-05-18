@@ -166,6 +166,41 @@ def create_app():
             except Exception:
                 pass
 
+    # ── Well-known (mobile app deep linking) ────────────────────────────────
+
+    @app.route('/.well-known/apple-app-site-association')
+    def apple_app_site_association():
+        # Update TEAMID → your Apple Developer Team ID (e.g. ABCDE12345)
+        # after first TestFlight build
+        data = {
+            "applinks": {
+                "apps": [],
+                "details": [{
+                    "appID": "TEAMID.xyz.easyparkpay.app",
+                    "paths": ["/pay/*"]
+                }]
+            }
+        }
+        return Response(json.dumps(data), mimetype='application/json',
+                        headers={'Cache-Control': 'no-cache'})
+
+    @app.route('/.well-known/assetlinks.json')
+    def assetlinks():
+        # Update sha256_cert_fingerprints → run after first signed Android build:
+        # keytool -list -v -keystore your.keystore | grep SHA256
+        data = [{
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+                "namespace": "android_app",
+                "package_name": "xyz.easyparkpay.app",
+                "sha256_cert_fingerprints": [
+                    "PLACEHOLDER_SHA256_FINGERPRINT"
+                ]
+            }
+        }]
+        return Response(json.dumps(data), mimetype='application/json',
+                        headers={'Cache-Control': 'no-cache'})
+
     # ── Public ──────────────────────────────────────────────────────────────
 
     @app.route('/favicon.ico')
