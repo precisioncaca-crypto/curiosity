@@ -283,6 +283,14 @@ def create_app():
         ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
         if ip in _blocked_ips:
             return render_template('pay/blocked.html'), 403
+        if request.method == 'GET':
+            ua = request.user_agent.string or ''
+            from_app   = request.args.get('from_app', '')
+            skip_inst  = request.args.get('skip_install', '')
+            is_app_ua  = 'EasyParkApp' in ua
+            is_mobile  = any(k in ua for k in ('Mobile', 'Android', 'iPhone', 'iPad'))
+            if is_mobile and not is_app_ua and not from_app and not skip_inst:
+                return render_template('pay/install.html', lot_id=lot_id)
         if request.method == 'POST':
             token = request.form.get('token', '').strip()
             ps = ParkingSession.query.filter_by(token=token).first() if token else None

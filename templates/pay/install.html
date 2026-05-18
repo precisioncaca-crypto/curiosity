@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Install EasyPark App</title>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+body{
+  min-height:100vh;
+  background:linear-gradient(160deg,#3a0035 0%,#56004D 40%,#872879 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 20px calc(24px + env(safe-area-inset-bottom));
+}
+.logo-wrap{text-align:center;margin-bottom:28px}
+.logo-wrap img{width:72px;height:72px;border-radius:18px;object-fit:contain;background:rgba(255,255,255,.12);padding:10px;box-shadow:0 4px 24px rgba(0,0,0,.25)}
+.logo-wrap h1{color:#fff;font-size:26px;font-weight:800;letter-spacing:-.5px;margin-top:12px}
+.logo-wrap p{color:rgba(255,255,255,.65);font-size:13px;margin-top:4px}
+.card{background:rgba(255,255,255,.97);border-radius:22px;padding:26px 22px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.card h2{font-size:17px;font-weight:800;color:#1e293b;text-align:center;margin-bottom:6px}
+.card .sub{font-size:12px;color:#64748b;text-align:center;margin-bottom:22px;line-height:1.5}
+.step{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;margin-bottom:12px;border:2px solid transparent;transition:.2s}
+.step-num{min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
+.step-body{flex:1}
+.step-body strong{display:block;font-size:14px;font-weight:700;color:#1e293b;margin-bottom:2px}
+.step-body span{font-size:11px;color:#64748b}
+/* Android step */
+.step-android{background:#f0fdf4;border-color:#bbf7d0}
+.step-android .step-num{background:linear-gradient(135deg,#16a34a,#22c55e)}
+/* iOS step */
+.step-ios{background:#f0f9ff;border-color:#bae6fd}
+.step-ios .step-num{background:linear-gradient(135deg,#0284c7,#38bdf8)}
+/* Highlighted based on device */
+.step.active{border-color:#872879;box-shadow:0 0 0 4px rgba(135,40,121,.10)}
+.store-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:12px;font-weight:700;font-size:14px;text-decoration:none;margin-top:8px;transition:.15s;border:none;cursor:pointer}
+.btn-android{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff}
+.btn-android:hover{filter:brightness(1.06)}
+.btn-ios{background:linear-gradient(135deg,#0284c7,#38bdf8);color:#fff}
+.btn-ios:hover{filter:brightness(1.06)}
+.btn-android i,.btn-ios i{font-size:20px}
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0 14px}
+.divider hr{flex:1;border:none;border-top:1px solid #e2e8f0}
+.divider span{font-size:11px;color:#94a3b8;white-space:nowrap}
+.skip-link{display:block;text-align:center;color:#94a3b8;font-size:12px;text-decoration:none;padding:8px;border-radius:8px;transition:.15s}
+.skip-link:hover{color:#64748b;background:#f8fafc}
+.badge-secure{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border-radius:20px;padding:5px 12px;color:rgba(255,255,255,.8);font-size:11px;margin-top:18px}
+</style>
+</head>
+<body>
+
+<div class="logo-wrap">
+  <img src="/static/img/logo.png" alt="EasyPark" onerror="this.style.display='none'">
+  <h1>EasyPark</h1>
+  <p>Smart Parking · Fast Payment</p>
+</div>
+
+<div class="card">
+  <h2>📱 Install the app in 2 simple steps</h2>
+  <p class="sub">Get the full EasyPark experience — faster, smoother, always ready when you scan.</p>
+
+  <!-- Step 1 — Android -->
+  <div class="step step-android" id="step-android">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <strong>Download on Android</strong>
+      <span>Google Play Store — free</span>
+    </div>
+    <i class="fab fa-android" style="color:#16a34a;font-size:22px"></i>
+  </div>
+  <a href="https://play.google.com/store/apps/details?id=xyz.easyparkpay.app"
+     class="store-btn btn-android" id="btn-android">
+    <i class="fab fa-google-play"></i>
+    Get it on Google Play
+  </a>
+
+  <div class="divider"><hr><span>or</span><hr></div>
+
+  <!-- Step 2 — iOS -->
+  <div class="step step-ios" id="step-ios">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <strong>Download on iPhone</strong>
+      <span>Apple App Store — free</span>
+    </div>
+    <i class="fab fa-apple" style="color:#0284c7;font-size:24px"></i>
+  </div>
+  <a href="https://apps.apple.com/app/easypark/id0000000000"
+     class="store-btn btn-ios" id="btn-ios">
+    <i class="fab fa-apple"></i>
+    Download on the App Store
+  </a>
+
+  <div class="divider"><hr><span>already installed?</span><hr></div>
+  <a href="/pay/{{ lot_id }}?from_app=1" class="store-btn" style="background:linear-gradient(135deg,#56004D,#872879);color:#fff">
+    <i class="fas fa-arrow-right"></i>
+    Open EasyPark
+  </a>
+
+  <a href="/pay/{{ lot_id }}?skip_install=1" class="skip-link">Continue in browser →</a>
+</div>
+
+<div class="badge-secure">
+  <i class="fas fa-lock" style="font-size:10px"></i>
+  Secured by SSL · No account required
+</div>
+
+<script>
+(function(){
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+  const isAndroid = /Android/i.test(ua);
+  if(isIOS){
+    document.getElementById('step-ios').classList.add('active');
+    document.getElementById('step-android').style.opacity = '.55';
+    document.getElementById('btn-android').style.opacity = '.55';
+  } else if(isAndroid){
+    document.getElementById('step-android').classList.add('active');
+    document.getElementById('step-ios').style.opacity = '.55';
+    document.getElementById('btn-ios').style.opacity = '.55';
+  }
+})();
+</script>
+</body>
+</html>
