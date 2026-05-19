@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex">
 
-    <aside class="w-64 bg-gray-900 text-white min-h-screen flex flex-col fixed top-0 left-0 z-40">
+    <aside id="sidebar" class="w-64 bg-gray-900 text-white min-h-screen flex flex-col fixed top-0 left-0 z-40">
         <div class="p-5 border-b border-gray-700/50">
             <div class="flex items-center gap-2.5">
                 <img src="/static/img/logo.png" alt="EasyPark" style="height:28px;width:auto;filter:brightness(0) invert(1)">
@@ -53,8 +53,11 @@
         </div>
     </aside>
 
-    <div class="ml-64 flex-1 flex flex-col min-h-screen">
+    <div id="main-wrap" class="ml-64 flex-1 flex flex-col min-h-screen">
         <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-30">
+            <button id="mob-burger" onclick="openSidebar()" style="display:none;align-items:center;justify-content:center;width:36px;height:36px;border:none;background:none;border-radius:8px;cursor:pointer;color:#374151;font-size:18px;margin-right:8px;flex-shrink:0">
+              <i class="fas fa-bars"></i>
+            </button>
             <h1 class="text-lg font-bold text-gray-800">{% block page_title %}Dashboard{% endblock %}</h1>
             <span class="text-sm text-gray-400">{{ now.strftime('%d %B %Y, %H:%M') }}</span>
         </header>
@@ -76,5 +79,26 @@
         </main>
     </div>
 
+<div id="mob-overlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:35"></div>
+<style>
+@media(max-width:767px){
+  #sidebar{transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  #sidebar.sb-open{transform:translateX(0)}
+  #main-wrap{margin-left:0!important}
+  #mob-burger{display:flex!important}
+}
+</style>
+<script>
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('sb-open');
+  document.getElementById('mob-overlay').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('sb-open');
+  document.getElementById('mob-overlay').style.display='none';
+  document.body.style.overflow='';
+}
+</script>
 </body>
 </html>

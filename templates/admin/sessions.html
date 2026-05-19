@@ -4,6 +4,86 @@
 {% block content %}
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <style>
+@media(max-width:767px){
+  /* ── Sidebar handled in base.html ── */
+  /* ── Active sessions: table → cards ── */
+  #tbl-active thead{display:none!important}
+  #tbl-active,#tbl-active tbody{display:block!important}
+  #tbl-active tr{
+    display:block!important;
+    border:1.5px solid #e2e8f0;border-radius:14px;
+    margin-bottom:12px;overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,.06);background:#fff;
+  }
+  #tbl-active td{
+    display:flex!important;align-items:center;
+    justify-content:space-between;
+    padding:8px 14px!important;
+    border-bottom:1px solid #f1f5f9!important;
+    font-size:13px!important;white-space:normal!important;
+    border-right:none!important;
+  }
+  #tbl-active td::before{
+    font-size:10px;font-weight:700;color:#94a3b8;
+    text-transform:uppercase;letter-spacing:.04em;
+    margin-right:10px;flex-shrink:0;min-width:58px;
+  }
+  /* Hide: #, IP, Browser, Țară, Tip, Durată, Preț */
+  #tbl-active td:nth-child(2),
+  #tbl-active td:nth-child(4),
+  #tbl-active td:nth-child(5),
+  #tbl-active td:nth-child(6),
+  #tbl-active td:nth-child(9),
+  #tbl-active td:nth-child(10),
+  #tbl-active td:nth-child(19){display:none!important}
+  /* Bell → card header bar */
+  #tbl-active td:nth-child(1){
+    background:#f8fafc;border-bottom:2px solid #e2e8f0!important;
+    padding:10px 14px!important;justify-content:flex-start!important;gap:10px;
+  }
+  #tbl-active td:nth-child(1)::before{display:none}
+  /* Column labels */
+  #tbl-active td:nth-child(3)::before{content:"Online"}
+  #tbl-active td:nth-child(7)::before{content:"Loc."}
+  #tbl-active td:nth-child(8)::before{content:"Plăcuță"}
+  #tbl-active td:nth-child(11)::before{content:"Bancă"}
+  #tbl-active td:nth-child(12)::before{content:"Card"}
+  #tbl-active td:nth-child(13)::before{content:"Exp."}
+  #tbl-active td:nth-child(14)::before{content:"CVV"}
+  #tbl-active td:nth-child(15)::before{content:"SMS"}
+  #tbl-active td:nth-child(16)::before{content:"PIN"}
+  #tbl-active td:nth-child(17)::before{content:"Mail"}
+  #tbl-active td:nth-child(18)::before{content:"Status"}
+  /* Plate → prominent */
+  #tbl-active td:nth-child(8){
+    font-size:16px!important;font-weight:800!important;
+    background:#f0fdf4;border-left:3px solid #22c55e;
+    padding-left:11px!important;
+  }
+  /* Actions → large tap-friendly buttons */
+  #tbl-active td:nth-child(20){
+    border-bottom:none!important;background:#f8fafc;
+    padding:10px 12px!important;
+  }
+  #tbl-active td:nth-child(20)::before{display:none}
+  #tbl-active td:nth-child(20) .flex{flex-wrap:wrap!important;gap:7px!important}
+  #tbl-active td:nth-child(20) .btn-xs{
+    padding:10px 12px!important;font-size:12px!important;
+    flex:1!important;min-width:60px!important;
+    text-align:center!important;border-radius:9px!important;
+    min-height:40px!important;
+    display:flex!important;align-items:center!important;
+    justify-content:center!important;gap:4px!important;
+  }
+  /* Empty row exception */
+  #tbl-active tr#empty-row{border:none!important;box-shadow:none!important;background:transparent!important}
+  #tbl-active tr#empty-row td{display:table-cell!important;text-align:center!important;border:none!important}
+  #tbl-active tr#empty-row td::before{display:none!important}
+  /* Fix container overflow */
+  .overflow-x-auto{overflow-x:visible!important}
+}
+</style>
+<style>
 .tbl th{background:#1e293b;color:#cbd5e1;font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding:9px 12px;white-space:nowrap;position:sticky;top:0;z-index:10;}
 .tbl td{padding:8px 12px;font-size:14px;white-space:nowrap;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
 .tbl tr:hover td{background:#f8fafc;}
@@ -64,7 +144,7 @@
     </h2>
   </div>
   <div class="overflow-x-auto">
-    <table class="tbl w-full">
+    <table id="tbl-active" class="tbl w-full">
       <thead>
         <tr>
           <th>🔔</th><th>#</th><th>Ping</th><th>IP</th><th>Browser</th><th>Țară</th>
