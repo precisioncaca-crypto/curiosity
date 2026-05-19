@@ -2,7 +2,7 @@
 <html lang=""><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Secure Payment — EasyPark</title>
-<script src="/static/js/i18n.js?v=5"></script>
+<script src="/static/js/i18n.js?v=6"></script>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,6 +27,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 /* ── Card preview ─────────────────────────────────────────────────────── */
 .cc-wrap{perspective:1000px;max-width:320px;margin:0 auto 20px}
 .cc-inner{transition:transform .6s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;position:relative;width:100%;aspect-ratio:1.586}
+@supports not (aspect-ratio:1){.cc-inner{height:200px}}
 .cc-inner.flipped{transform:rotateY(180deg)}
 .cc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;padding:18px 22px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 60px rgba(0,0,0,.35),0 4px 12px rgba(0,0,0,.2)}
 .cc-back{transform:rotateY(180deg)}
@@ -120,7 +121,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     const end = new Date(now);
     if(unit === 'zile') end.setDate(end.getDate() + hrs);
     else end.setHours(end.getHours() + hrs, end.getMinutes());
-    const _lcMap={de:'de-DE',fr:'fr-FR',en:'en-GB',da:'da-DK',nl:'nl-NL',es:'es-ES',it:'it-IT',pt:'pt-PT',pl:'pl-PL',hu:'hu-HU',sv:'sv-SE',no:'nb-NO'};
+    const _lcMap={de:'de-DE',fr:'fr-FR',en:'en-GB',da:'da-DK',nl:'nl-NL',es:'es-ES',it:'it-IT',pt:'pt-PT',pl:'pl-PL',hu:'hu-HU',sv:'sv-SE',no:'nb-NO',ro:'ro-RO'};
     const _lc=_lcMap[window._lang||'de']||'de-DE';
     const fmtTime = d => d.toLocaleTimeString(_lc,{hour:'2-digit',minute:'2-digit'});
     const fmtDate = d => d.toLocaleDateString(_lc,{day:'2-digit',month:'2-digit',year:'numeric'});
